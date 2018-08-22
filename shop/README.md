@@ -1,4 +1,4 @@
-There is some form of a bug, at the moment can't really trace down where the problem resides:
+There is some form of a bug, at the moment can't really trace down where the problem resides: Highly likely the bug resides very very locally "the noob at this end"
 
 ```
 ./gradlew users:run
