@@ -12,6 +12,6 @@ interface ChairService {
 
     Chair save(@NotBlank String name, @NotBlank String title)
     List<Chair> findAll()
-    Number count()
+    int count()
     Chair find(@NotNull Long id)
 }

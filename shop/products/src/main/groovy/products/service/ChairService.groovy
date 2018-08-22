@@ -10,6 +10,6 @@ import javax.validation.constraints.NotNull
 interface ChairService {
     Chair save(@Valid Chair chair)
     List<Chair> findAll()
-    Number count()
+    int count()
     Chair find(@NotNull Long id)
 }

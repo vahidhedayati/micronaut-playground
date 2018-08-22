@@ -7,15 +7,15 @@ import grails.gorm.annotation.Entity
 class Product {
 
     String name
-    String title
+    String description
 
-   // Date date
+    Date date
 
-   // BigDecimal price
+    BigDecimal price
 
-   // static mapping = {
+    static mapping = {
         //cache true
         //tablePerConcreteClass false
-     //   tablePerHierarchy false
-    //}
+        tablePerHierarchy false
+    }
 }

@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull
 interface ProductNonExtendedService {
     ProductNonExtended save(@NotBlank String name, @NotBlank String title)
     List<ProductNonExtended> findAll()
-    Number count()
+    int count()
     ProductNonExtended find(@NotNull Long id)
 
 }
