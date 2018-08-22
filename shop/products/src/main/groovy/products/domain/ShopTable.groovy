@@ -4,7 +4,7 @@ import grails.gorm.annotation.Entity
 
 
 @Entity
-class Table extends Generic {
+class ShopTable extends Generic {
 
    // static mapping = {
       //  discriminator value: 'table'

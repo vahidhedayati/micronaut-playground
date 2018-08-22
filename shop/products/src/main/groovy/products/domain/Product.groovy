@@ -7,7 +7,7 @@ import grails.gorm.annotation.Entity
 class Product {
 
     String name
-    String description
+    String title
 
    // Date date
 

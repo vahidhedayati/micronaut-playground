@@ -1,14 +1,13 @@
 package products.controller
 
-import groovy.transform.CompileStatic
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import products.domain.Chair
 import products.domain.Product
-import products.domain.Table
+import products.domain.ShopTable
 import products.service.ChairService
 import products.service.ProductService
-import products.service.TableService
+import products.service.ShopTableService
 
 @Controller("/")
 
@@ -16,7 +15,7 @@ import products.service.TableService
 class ProductController {
     final ProductService productService
     final ChairService chairService
-    final TableService tableService
+    final ShopTableService shopTableService
 
     ProductController(ProductService productService) {
         this.productService = productService
@@ -26,8 +25,8 @@ class ProductController {
         this.chairService = chairService
     }
 
-    ProductController(TableService tableService) {
-        this.tableService = tableService
+    ProductController(ShopTableService shopTableService) {
+        this.shopTableService = shopTableService
     }
 
     @Get("/")
@@ -41,7 +40,7 @@ class ProductController {
     }
 
     @Get("/tables")
-    List<Table> listTables() {
+    List<ShopTable> listTables() {
         return tableService.findAll()
     }
 
