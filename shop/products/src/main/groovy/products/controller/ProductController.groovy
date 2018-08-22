@@ -6,15 +6,28 @@ import io.micronaut.http.annotation.Get
 import products.domain.Chair
 import products.domain.Product
 import products.domain.Table
+import products.service.ChairService
 import products.service.ProductService
+import products.service.TableService
 
 @Controller("/")
-@CompileStatic
+
+
 class ProductController {
     final ProductService productService
+    final ChairService chairService
+    final TableService tableService
 
     ProductController(ProductService productService) {
         this.productService = productService
+    }
+
+    ProductController(ChairService chairService) {
+        this.chairService = chairService
+    }
+
+    ProductController(TableService tableService) {
+        this.tableService = tableService
     }
 
     @Get("/")
@@ -24,12 +37,12 @@ class ProductController {
 
     @Get("/chairs")
     List<Chair> listChairs() {
-        return productService.findAllChairs()
+        return chairService.findAll()
     }
 
     @Get("/tables")
     List<Table> listTables() {
-        return productService.findAllTables()
+        return tableService.findAll()
     }
 
     @Get("/{id}")

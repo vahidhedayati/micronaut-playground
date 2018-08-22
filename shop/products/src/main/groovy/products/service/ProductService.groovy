@@ -6,25 +6,19 @@ import products.domain.Product
 import products.domain.Table
 
 import javax.validation.Valid
+import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 @Service(Product)
-abstract class ProductService {
-
-    abstract Product save(@Valid Product product)
-    abstract Table save(@Valid Table Table)
-    abstract Chair save(@Valid Chair chair)
-
-    abstract List<Product> findAll()
-    abstract List<Table> findAllTables()
-    abstract List<Chair> findAllChairs()
-
-
-    abstract Number count()
-
-
-    abstract Product find(@NotNull Long id)
-    abstract Table findTable(@NotNull Long id)
-    abstract Chair findChair(@NotNull Long id)
+interface ProductService {
+    Product save(Product product)
+    Product save(@NotBlank String name,@NotBlank String description)
+    Table save(Table Table)
+    Chair save(@Valid Chair chair)
+    List<Product> findAll()
+    Number count()
+    Product find(@NotNull Long id)
+    Table findTable(@NotNull Long id)
+    Chair findChair(@NotNull Long id)
 
 }

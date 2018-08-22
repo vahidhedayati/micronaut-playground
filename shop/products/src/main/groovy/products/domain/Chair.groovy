@@ -8,7 +8,7 @@ class Chair extends Generic {
 
     Boolean wheels=false
 
-    static mapping = {
-        discriminator value: 'chair'
-    }
+  //  static mapping = {
+      //  discriminator value: 'chair'
+   // }
 }

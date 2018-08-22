@@ -9,13 +9,13 @@ class Product {
     String name
     String description
 
-    Date date
+   // Date date
 
-    BigDecimal price
+   // BigDecimal price
 
-    static mapping = {
+   // static mapping = {
         //cache true
         //tablePerConcreteClass false
-        tablePerHierarchy false
-    }
+     //   tablePerHierarchy false
+    //}
 }

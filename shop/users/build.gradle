@@ -1,4 +1,4 @@
-mainClassName = "users.Application"
+
 buildscript {
     repositories {
         mavenCentral()

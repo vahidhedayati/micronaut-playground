@@ -9,8 +9,8 @@ class Generic extends Product {
     Integer width=0
     Integer height=0
 
-    static mapping = {
-        discriminator value: 'generic'
-    }
+    //static mapping = {
+   //     discriminator value: 'generic'
+   // }
 
 }
