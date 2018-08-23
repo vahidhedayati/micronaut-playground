@@ -6,7 +6,6 @@ import products.domain.Product
 import products.domain.ShopTable
 
 import javax.validation.Valid
-import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 @Service(Product)

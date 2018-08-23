@@ -1,6 +1,5 @@
 package products.init
 
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.env.Environment

@@ -16,7 +16,7 @@ class UserController {
     }
 
     @Get("/")
-    List<User> list() {
+    List<User> listUsers() {
         return userService.findAll()
     }
 
