@@ -17,7 +17,7 @@ class OrderController {
     @Get("/")
     List<OrderView> findAll() {
         orderService.findAll().collect {
-            orderService.toView(it).blockingGet()
+            orderService.toView(it)
         }
     }
 

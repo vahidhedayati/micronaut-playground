@@ -1,3 +1,24 @@
+MicroNaut quick tester
+---
+
+Just trying to get my head around all of this new stuff, This sample project contains 3 micro service applications:
+
+
+1. Users - has a list of users the details are stored on h2 DB internall on memory.
+
+2. Products - has a list of products - this is a more complex example which uses extended features to expand over multiple product types again the data is held on h2 db internally on memory
+
+3. Orders - This has a few entries which simply store the order Id, product Id, userId, price at time and quantity - this requires consul technology to route the clients to correct micro service apps as per above.
+ So above needs to be running before order is started.
+ The OrdersView class is used to bind those ids  and within OrderService it interacts with the end service to fill in the missing bits i.e. the username and product name.
+
+  The overview Class has a dynamic getter which auto populates final total based on quantity user purchased and price at the given time:
+
+As you can see by the very last JSON String:
+```
+quantity":6,"username":"jsmith","firstName":"John","lastName":"Smith","date":1535035782440,"total":1887.30}
+```
+
 
 ```
 ./gradlew users:run
@@ -23,11 +44,27 @@ and you see:
 
 
 
-This is not done as yet Ignore below
+The final product
 ----
 
 Once those are running the rest may be started individually or as a group.
 ```
-./gradlew orders:run  --parallel
+./gradlew orders:run
 ```
+
+Once you run this you will get: http://localhost:8180/
+
+This produces:
+```
+[{"productName":"Executive Chair","productDescription":"Exclusive table available in our shop for a limited period, hand crafted.","price":554.55,"quantity":1,"username":"jsmith","firstName":"John","lastName":"Smith","date":1535035782365,"total":554.55},{"productName":"Mid Executive Table","productDescription":"\n             Exclusive table available in our shop for a limited period, hand crafted.\n            ","price":314.55,"quantity":6,"username":"jsmith","firstName":"John","lastName":"Smith","date":1535035782440,"total":1887.30}]
+```
+
+
+In order to run this project you will also need to get hold of and install consul and launch by default: https://www.consul.io/downloads.html
+```
+ ./consul agent -dev
+
+```
+
+This is required for the final bit but configured in all - so that it can route the traffic for routed app i.e. products / users
 

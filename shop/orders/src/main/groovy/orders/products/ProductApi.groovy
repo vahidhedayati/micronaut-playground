@@ -6,5 +6,5 @@ import orders.users.User
 
 interface ProductApi {
     @Get("/{id}")
-    Maybe<User> findProduct(Long id)
+    Maybe<Product> findProduct(Long id)
 }
