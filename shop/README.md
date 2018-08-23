@@ -4,9 +4,9 @@ MicroNaut quick tester
 Just trying to get my head around all of this new stuff, This sample project contains 3 micro service applications:
 
 
-1. Users - has a list of users the details are stored on h2 DB internall on memory.
+1. Users - has a list of users the details are stored on h2 DB internally in memory.
 
-2. Products - has a list of products - this is a more complex example which uses extended features to expand over multiple product types again the data is held on h2 db internally on memory
+2. Products - has a list of products - this is a more complex example which uses extended features to expand over multiple product types again the data is held on h2 db internally in memory
 
 3. Orders - This has a few entries which simply store the order Id, product Id, userId, price at time and quantity - this requires consul technology to route the clients to correct micro service apps as per above.
  So above needs to be running before order is started.
@@ -20,6 +20,11 @@ quantity":6,"username":"jsmith","firstName":"John","lastName":"Smith","date":153
 ```
 
 
+
+1. Starting users microservice:
+---
+From the shop folder run:
+
 ```
 ./gradlew users:run
 ```
@@ -30,6 +35,10 @@ and you see:
 [{"username":"jsmith","firstName":"John","lastName":"Smith","password":"password","id":1},{"username":"cjones","firstName":"Casey","lastName":"Jones","password":"password1","id":2},{"username":"mbutler","firstName":"Mike","lastName":"Butler","password":"password2","id":3},{"username":"jhanes","firstName":"Jim","lastName":"Hanes","password":"password3","id":4},{"username":"ksmith","firstName":"Kevin","lastName":"Smith","password":"password4","id":5}]
 ```
 
+
+
+2. Starting products microservice:
+---
 This is an extended domain class example all now working
 ```
 ./gradlew products:run
@@ -43,9 +52,8 @@ and you see:
 
 
 
-
-The final product
-----
+3. Starting Orders microservice:
+---
 
 Once those are running the rest may be started individually or as a group.
 ```
@@ -68,6 +76,8 @@ In order to run this project you will also need to get hold of and install consu
 
 This is required for the final bit but configured in all - so that it can route the traffic for routed app i.e. products / users
 
+
+---------------
 
 HQL on Micronauts
 ----
