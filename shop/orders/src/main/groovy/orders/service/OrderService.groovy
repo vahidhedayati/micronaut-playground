@@ -76,7 +76,7 @@ abstract class OrderService {
      * @return
      */
     @Transactional(readOnly = true)
-    List customList(final Long startOrganisationId) {
+    List customList() {
 
         final String query = """select new map( o.id as orderId, o.userId as userId,
                                                 o.productId as productId,o.date as date,o.price as price
@@ -91,7 +91,10 @@ abstract class OrderService {
                                                 p.name as productName,
                                                 p.description as productDescription
 
-, User u, Product p
+
+        , User u, Product p
+
+
                                                 where p.id=o.productId and u.id=o.userId
 
          */
@@ -99,7 +102,7 @@ abstract class OrderService {
 
         def results = Orders.executeQuery(query,[],[readOnly:true])
 
-        println "--- results = $results"
+//        println "--- results = $results"
         return results
     }
 }
