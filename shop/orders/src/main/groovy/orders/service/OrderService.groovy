@@ -1,6 +1,7 @@
 package orders.service
 
 import grails.gorm.services.Service
+import grails.gorm.transactions.Transactional
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import orders.domain.Orders
@@ -9,6 +10,7 @@ import orders.products.ProductClient
 import orders.users.User
 import orders.users.UserClient
 import orders.view.OrderView
+import org.hibernate.transform.AliasToEntityMapResultTransformer
 
 import javax.inject.Inject
 import javax.validation.Valid
@@ -24,6 +26,9 @@ abstract class OrderService {
     abstract Orders save(@Valid Orders orders)
     abstract List<Orders> findAll()
     abstract Number count()
+
+    def dataSource
+
 
     /**
      * Noob learning curve - I had a lot of different methods and simply not understood what blockingGet was doing
@@ -56,5 +61,45 @@ abstract class OrderService {
 
         //Return filled in object binding ther order with products and users
         return orderView
+    }
+
+    /**
+     * This is a working example querying the existing domain class using HQL query instead this works :
+     * http://localhost:8180/custom
+     * produces: [{"date":1535038163686,"productId":1,"orderId":1,"userId":1,"price":55.50},{"date":1535038163743,"productId":2,"orderId":2,"userId":1,"price":155.50}]
+     *
+     *
+     * Was unable to cross connect to Product or User since they are on the other microservice apps  -
+     * there is nothing stopping using something like above to pass bits of below or all of below to remote calls
+     * that then do HQL queries to return results this way if you prefer
+     * @param startOrganisationId
+     * @return
+     */
+    @Transactional(readOnly = true)
+    List customList(final Long startOrganisationId) {
+
+        final String query = """select new map( o.id as orderId, o.userId as userId,
+                                                o.productId as productId,o.date as date,o.price as price
+
+                                               )
+            from Orders o  order by o.id
+
+"""
+        /*
+        ,
+                                                u.username as username,
+                                                p.name as productName,
+                                                p.description as productDescription
+
+, User u, Product p
+                                                where p.id=o.productId and u.id=o.userId
+
+         */
+
+
+        def results = Orders.executeQuery(query,[],[readOnly:true])
+
+        println "--- results = $results"
+        return results
     }
 }

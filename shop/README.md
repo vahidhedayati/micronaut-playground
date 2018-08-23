@@ -68,3 +68,20 @@ In order to run this project you will also need to get hold of and install consu
 
 This is required for the final bit but configured in all - so that it can route the traffic for routed app i.e. products / users
 
+
+HQL on Micronauts
+----
+
+ > http://localhost:8180/custom
+ > produces: [{"date":1535038163686,"productId":1,"orderId":1,"userId":1,"price":55.50},{"date":1535038163743,"productId":2,"orderId":2,"userId":1,"price":155.50}]
+
+Please refer to orderService.customList()
+```
+Was unable to cross connect to Product or User since they are on the other microservice apps  -
+there is nothing stopping using something like above to pass bits of below or all of below to remote calls
+that then do HQL queries to return results this way if you prefer
+```
+
+So if you wanted to do things the unprofessional way and rather than bind via a view you could just write raw HQL queries across your apps -
+
+Not sure if this is a good practise or not - it appears to work

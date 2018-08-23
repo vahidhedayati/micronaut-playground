@@ -20,5 +20,10 @@ class OrderController {
             orderService.toView(it)
         }
     }
+    @Get("/custom")
+    List doIt() {
+        return orderService.customList()
+    }
+
 
 }
