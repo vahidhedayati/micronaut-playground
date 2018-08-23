@@ -1,6 +1,7 @@
 package products.service
 
 import grails.gorm.services.Service
+import grails.gorm.transactions.Transactional
 import products.domain.Chair
 import products.domain.Product
 import products.domain.ShopTable
@@ -26,5 +27,16 @@ abstract class ProductService {
     abstract Product find(@NotNull Long id)
     abstract ShopTable findTable(@NotNull Long id)
     abstract Chair findChair(@NotNull Long id)
+
+    @Transactional(readOnly = true)
+    List findBatch(List<Long> ids) {
+        //select new map( id as id, name as productName,
+        //description as description, price as price, width as width, height as height, wheels as wheels)
+        final String query = """
+            from Product where id in (:ids)
+            """
+        return Product.executeQuery(query,[ids:ids],[readOnly:true])
+    }
+
 
 }

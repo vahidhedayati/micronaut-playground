@@ -41,11 +41,16 @@ class ProductController {
 
     @Get("/tables")
     List<ShopTable> listTables() {
-        return tableService.findAll()
+        return shopTableService.findAll()
     }
 
     @Get("/{id}")
     Product show(Long id) {
         return productService.find(id)
+    }
+
+    @Get("/parseIds/{ids}")
+    List parseIds(List<Long>  ids) {
+        return productService.findBatch(ids)
     }
 }

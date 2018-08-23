@@ -27,8 +27,6 @@ abstract class OrderService {
     abstract List<Orders> findAll()
     abstract Number count()
 
-    def dataSource
-
 
     /**
      * Noob learning curve - I had a lot of different methods and simply not understood what blockingGet was doing
@@ -85,8 +83,10 @@ abstract class OrderService {
             from Orders o  order by o.id
 
 """
+
         /*
-        ,
+        * This was an attempt to cross join with other microservices which failed
+
                                                 u.username as username,
                                                 p.name as productName,
                                                 p.description as productDescription
@@ -100,9 +100,21 @@ abstract class OrderService {
          */
 
 
+        //But.....
+        //We now have an overall map of all of above
         def results = Orders.executeQuery(query,[],[readOnly:true])
+        def userResults=[]
+        def productResult=[]
 
-//        println "--- results = $results"
-        return results
+        //Set it to be blank if there is results otherwise return results this will be final output
+        List finalResults=results ? [] : results
+        if (results) {
+            userResults = userClient.findUserBatch(results.userId)
+            productResult = productClient.findProductBatch(results.productId)
+            results?.each { res->
+                finalResults << (res.collect{it}+productResult?.find{it.id==res.productId}?.collect{it}+userResults?.find{it.id==res.userId}?.collect{it})
+            }
+        }
+        return finalResults
     }
 }

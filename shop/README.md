@@ -83,15 +83,43 @@ HQL on Micronauts
 ----
 
  > http://localhost:8180/custom
- > produces: [{"date":1535038163686,"productId":1,"orderId":1,"userId":1,"price":55.50},{"date":1535038163743,"productId":2,"orderId":2,"userId":1,"price":155.50}]
+ > produces:
+ ```
+ [[{"date":1535042108063},{"productId":1},{"orderId":1},{"userId":1},{"price":55.50},{"name":"Executive Chair","description":"Exclusive table available in our shop for a limited period, hand crafted.","date":1535042096146,"price":554.55,"id":1},{"username":"jsmith","firstName":"John","lastName":"Smith","password":"password","id":1}],[{"date":1535042108123},{"productId":2},{"orderId":2},{"userId":1},{"price":155.50},{"name":"Mid Executive Table","description":"\n             Exclusive table available in our shop for a limited period, hand crafted.\n            ","date":1535042096210,"price":314.55,"id":2},{"username":"jsmith","firstName":"John","lastName":"Smith","password":"password","id":1}]]
+
+ ```
 
 Please refer to orderService.customList()
-```
-Was unable to cross connect to Product or User since they are on the other microservice apps  -
+
+I was unable to cross connect to Product or User since they are on the other microservice apps  -
 there is nothing stopping using something like above to pass bits of below or all of below to remote calls
 that then do HQL queries to return results this way if you prefer
+
+Cross joining the HQL Queries and doing a similar thing to views above but via HQL
+---
+I have updated the customList example to go off and query based on returned ids of the first query so it passes a list of userIds to userCall and looks up all the users
+Then it sends a similar check to products
 ```
+//In OrderService...
+        if (results) {
+            userResults = userClient.findUserBatch(results.userId)
+            productResult = productClient.findProductBatch(results.productId)
+            results?.each { res->
+                finalResults << (res.collect{it}+productResult?.find{it.id==res.productId}?.collect{it}+userResults?.find{it.id==res.userId}?.collect{it})
+            }
+        }
+        return finalResults
+```
+
+These call the effective calls in the Apis which then call the actions on end microservice which passes a list of the ids across to the HQL queries now found on ProductService and UserService.
+
+
+
+The finalResults gets set as a collection of all the objects. At the moment it also includes everything from the user and product objects including for example password.
+
+
 
 So if you wanted to do things the unprofessional way and rather than bind via a view you could just write raw HQL queries across your apps -
 
-Not sure if this is a good practise or not - it appears to work
+Not sure if this is a good practise or not - it appears to work as shown above....
+

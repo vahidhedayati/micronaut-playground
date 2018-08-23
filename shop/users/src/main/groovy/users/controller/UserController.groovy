@@ -24,4 +24,10 @@ class UserController {
     User show(Long id) {
         return userService.find(id)
     }
+
+    @Get("/parseIds/{ids}")
+    List parseIds(List<Long>  ids) {
+        return userService.findBatch(ids)
+    }
+
 }
