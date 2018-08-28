@@ -7,7 +7,7 @@ import io.reactivex.Maybe
 import orders.domain.Orders
 import orders.products.Product
 import orders.products.ProductClient
-import orders.users.User
+import orders.domain.User
 import orders.users.UserClient
 import orders.view.OrderView
 import org.hibernate.transform.AliasToEntityMapResultTransformer

@@ -1,4 +1,4 @@
-package orders.users
+package conmbinedshop.domain
 import grails.gorm.annotation.Entity
 
 @Entity

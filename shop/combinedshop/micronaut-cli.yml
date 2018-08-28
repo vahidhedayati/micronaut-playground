@@ -1,0 +1,5 @@
+profile: service
+defaultPackage: combinedshop
+---
+testFramework: spock
+sourceLanguage: groovy
