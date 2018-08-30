@@ -1,5 +1,5 @@
 profile: service
-defaultPackage: combinedshop
+defaultPackage: groovysocket
 ---
 testFramework: spock
 sourceLanguage: groovy

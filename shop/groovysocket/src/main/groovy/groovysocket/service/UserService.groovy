@@ -2,7 +2,7 @@ package users.service
 
 import grails.gorm.services.Service
 import grails.gorm.transactions.Transactional
-import users.domain.User
+import groovysocket.domain.User
 
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
@@ -26,11 +26,8 @@ abstract class UserService {
         return User.executeQuery(query,[ids:ids],[readOnly:true])
     }
 
-
-
     @Transactional(readOnly = true)
-    def lookup(String username) {
-        println "ATTEMPTING TO LOOKUP ${username}"
+    User lookup(String username) {
         final String query = """
             from User where lower(username) =:username
             """

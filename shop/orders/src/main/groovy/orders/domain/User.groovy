@@ -14,4 +14,13 @@ class User {
         password nullable: true
     }
 
+
+    Map loadValues() {
+        Map result=[:]
+        result.username=username
+        result.firstName=firstName
+        result.lastName=lastName
+        return result
+    }
+
 }

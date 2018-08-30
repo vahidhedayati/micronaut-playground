@@ -4,6 +4,7 @@ import grails.gorm.services.Service
 import grails.gorm.transactions.Transactional
 import io.reactivex.Flowable
 import io.reactivex.Maybe
+import orders.WebSocketClient
 import orders.domain.Orders
 import orders.products.Product
 import orders.products.ProductClient
@@ -14,6 +15,8 @@ import org.hibernate.transform.AliasToEntityMapResultTransformer
 
 import javax.inject.Inject
 import javax.validation.Valid
+import java.util.stream.Collectors
+import java.util.stream.IntStream
 
 @Service(Orders)
 abstract class OrderService {
@@ -106,15 +109,31 @@ abstract class OrderService {
         def userResults=[]
         def productResult=[]
 
+
         //Set it to be blank if there is results otherwise return results this will be final output
         List finalResults=results ? [] : results
         if (results) {
             userResults = userClient.findUserBatch(results.userId)
             productResult = productClient.findProductBatch(results.productId)
             results?.each { res->
-                finalResults << (res.collect{it}+productResult?.find{it.id==res.productId}?.collect{it}+userResults?.find{it.id==res.userId}?.collect{it})
+                finalResults << (res.collect{it}+productResult?.find{it.id==res.productId}?.collect{it}+\
+                 userResults?.find{it.id==res.userId}?.collect{User u-> u.loadValues()})
             }
         }
+
+        //Websocket test
+        String url = "ws://localhost:9000";
+        WebSocketClient client = new WebSocketClient(url);
+        client.open();
+        //final String fatty = IntStream.range(0, 1024).mapToObj(String::valueOf).collect(Collectors.joining());
+        client.<String>eval("lookup:" + "jsmith");
+
+        client.finalize();
+        client.close();
+
+
+
+
         return finalResults
     }
 }

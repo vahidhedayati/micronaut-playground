@@ -10,7 +10,7 @@ buildscript {
 }
 
 version "0.1"
-group "combinedshop"
+group "groovysocket"
 
 apply plugin:"io.spring.dependency-management"
 apply plugin:"com.github.johnrengelman.shadow"
@@ -36,13 +36,6 @@ dependencies {
     compile "io.micronaut:http-server-netty"
     compileOnly "io.micronaut:inject-groovy"
     runtime "ch.qos.logback:logback-classic:1.2.3"
-
-    compile "io.micronaut.configuration:hibernate-validator"
-    compile "io.micronaut.configuration:hibernate-gorm"
-    runtime "com.h2database:h2:1.4.196"
-    runtime "org.apache.tomcat:tomcat-jdbc:8.0.44"
-    //compile "io.micronaut:discovery-client"
-
     testCompile "io.micronaut:inject-groovy"
     testCompile("org.spockframework:spock-core:1.1-groovy-2.4") {
         exclude group: "org.codehaus.groovy", module: "groovy-all"
@@ -55,4 +48,4 @@ shadowJar {
 
 run.jvmArgs('-noverify', '-XX:TieredStopAtLevel=1')
 
-mainClassName = "combinedshop.Application"
+mainClassName = "groovysocket.Application"

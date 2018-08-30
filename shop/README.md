@@ -51,8 +51,18 @@ and you see:
 ```
 
 
+3. Starting groovysocket microservice:
+---
 
-3. Starting Orders microservice:
+```
+./gradlew groovysocket:run
+```
+Once you run this you will get: http://localhost:8186/ - this produces nothing - is pure socket test at moment
+Refer to README in the project
+
+
+
+4. Starting Orders microservice:
 ---
 
 Once those are running the rest may be started individually or as a group.
@@ -85,7 +95,13 @@ HQL on Micronauts
  > http://localhost:8180/custom
  > produces:
  ```
- [[{"date":1535042108063},{"productId":1},{"orderId":1},{"userId":1},{"price":55.50},{"name":"Executive Chair","description":"Exclusive table available in our shop for a limited period, hand crafted.","date":1535042096146,"price":554.55,"id":1},{"username":"jsmith","firstName":"John","lastName":"Smith","password":"password","id":1}],[{"date":1535042108123},{"productId":2},{"orderId":2},{"userId":1},{"price":155.50},{"name":"Mid Executive Table","description":"\n             Exclusive table available in our shop for a limited period, hand crafted.\n            ","date":1535042096210,"price":314.55,"id":2},{"username":"jsmith","firstName":"John","lastName":"Smith","password":"password","id":1}]]
+ [[{"date":1535042108063},{"productId":1},{"orderId":1},{"userId":1},{"price":55.50},{"name":"Executive Chair",
+ "description":"Exclusive table available in our shop for a limited period, hand crafted.","date":1535042096146,
+ "price":554.55,"id":1},{"username":"jsmith","firstName":"John","lastName":"Smith","password":"password","id":1}],
+ [{"date":1535042108123},{"productId":2},{"orderId":2},{"userId":1},{"price":155.50},{"name":"Mid Executive Table",
+ "description":"\n             Exclusive table available in our shop for a limited period, hand crafted.\n            ",
+ "date":1535042096210,"price":314.55,"id":2},{"username":"jsmith","firstName":"John","lastName":"Smith",
+ "password":"password","id":1}]]
 
  ```
 
@@ -97,7 +113,8 @@ that then do HQL queries to return results this way if you prefer
 
 Cross joining the HQL Queries and doing a similar thing to views above but via HQL
 ---
-I have updated the customList example to go off and query based on returned ids of the first query so it passes a list of userIds to userCall and looks up all the users
+I have updated the customList example to go off and query based on returned ids of the first query so it passes a
+list of userIds to userCall and looks up all the users
 Then it sends a similar check to products
 ```
 //In OrderService...
@@ -111,15 +128,46 @@ Then it sends a similar check to products
         return finalResults
 ```
 
-These call the effective calls in the Apis which then call the actions on end microservice which passes a list of the ids across to the HQL queries now found on ProductService and UserService.
+These call the effective calls in the Apis which then call the actions on end microservice which passes a list of the
+ids across to the HQL queries now found on ProductService and UserService.
 
 
 
-The finalResults gets set as a collection of all the objects. At the moment it also includes everything from the user and product objects including for example password.
+The finalResults gets set as a collection of all the objects. At the moment it also includes everything from the user
+and product objects including for example password.
 
 
 
 So if you wanted to do things the unprofessional way and rather than bind via a view you could just write raw HQL queries across your apps -
 
 Not sure if this is a good practise or not - it appears to work as shown above....
+
+
+
+---------------
+Netty Websockets
+----
+
+At the moment current efforts are all a stab in the dark, really unsure if there is any essential need to create
+websocket clients etc.
+ Initially a test of websocket client was added to User micro service. The additional parameters in DataLoader which
+ are now in the DataLoader of groovysocket project launch an additional port for websockets on port 9000.
+ This triggering of the port somehow conflicts with the consul service and from there on the actual app no longer appears on consul.
+
+ I needed the user app in order to make the rest of the test work so in short moved the websocket example over to groovysocket project.
+ Perhaps the best resource and not fully implemented is all of this:
+ https://github.com/netty/netty/tree/4.1/example/src/main/java/io/netty/example/http/websocketx
+
+
+ I have got a demo working although not quite sure if it serves any practice since the output of the sockets are shown
+ on console and is a map that appears as a string and would need further work i.e. `.tokenize('[],')` to
+  make it make it back into a  map.
+
+
+  The trouble is the output needs to be in orderService where it does client.connect and sends string.
+
+  I will be looking further into all this.
+
+  Also there is a file called WebsocketHandler in the groovysocket app which receives the text and does something with it.
+  Was unable to inject the service in this file. Not quite sure why
 
