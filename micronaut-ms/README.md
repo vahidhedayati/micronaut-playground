@@ -111,4 +111,25 @@ Billing betty ------------------------------------------------------------
 
 ```
 
-We actually have 3 different desks and each one has a different cost for each person, the more the test script is executed whilst the app is running the more the values go up since it is all in memory 
+We actually have 3 different desks and each one has a different cost for each person, the more the test script is executed whilst the app is running the more the values go up since it is all in memory
+
+
+The application port of the waiter has been hard coded in application.properties.
+
+This is how we can be sure by hitting 8082 is the 1 waiter, this line can be disabled in the application.properties file and it is then a case of either watching or looking at http://localhost:8500 consol to see which ports they are running on for a local test.
+
+This is all to be able to start multiple instances of the waiter.
+
+TODO
+--------
+Unsure if my example test model is correct, i.e. to have multiple tills which each are storing a different set of figures, we in the end have to find all instances of billing service to get a final total for a given user.
+You could easily run multiple instances of the waiter and you would then need to find each port to do different tests for a given user - this probably would give a more accurate result since the billing system would keep a central cost of all things.
+
+Perhaps the problem currently with running multiple billing instances is a local map storing the costs.
+
+ 
+
+
+
+
+ 
