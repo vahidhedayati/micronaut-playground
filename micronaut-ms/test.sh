@@ -11,6 +11,9 @@ declare -a arr=("fred" "wilma" "barney" "betty")
 
 		echo "Billing $i ------------------------------------------------------------"
 	 	curl -H "Accept:application/json"  http://localhost:8082/waiter/bill/${i}
+	 	curl -H "Accept:application/json"  http://localhost:8082/waiter/bill/${i}
+	 	curl -H "Accept:application/json"  http://localhost:8082/waiter/bill/${i}
+	 	curl -H "Accept:application/json"  http://localhost:8082/waiter/bill/${i}
 		echo
 
 	done

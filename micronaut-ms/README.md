@@ -50,3 +50,65 @@ Then run the `test.sh` script  watch all 3 billing systems
 
 
 Please look through screen shots for further details and running tests locally
+
+
+The test scrip when executed will show something like this:
+```
+./test.sh 
+Serving beer to fred ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing fred ------------------------------------------------------------
+{"cost":245.7,"deskId":34878}{"cost":245.7,"deskId":10963}{"cost":327.6,"deskId":6200}{"cost":245.7,"deskId":34878}
+Serving beer to wilma ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing wilma ------------------------------------------------------------
+{"cost":245.7,"deskId":34878}{"cost":245.7,"deskId":10963}{"cost":327.6,"deskId":6200}{"cost":245.7,"deskId":34878}
+Serving beer to barney ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing barney ------------------------------------------------------------
+{"cost":245.7,"deskId":34878}{"cost":245.7,"deskId":10963}{"cost":327.6,"deskId":6200}{"cost":245.7,"deskId":34878}
+Serving beer to betty ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing betty ------------------------------------------------------------
+{"cost":245.7,"deskId":34878}{"cost":245.7,"deskId":10963}{"cost":327.6,"deskId":6200}{"cost":245.7,"deskId":34878}
+
+
+```
+
+We actually have 3 different desks and each one has a different cost for each person, the more the test script is executed whilst the app is running the more the values go up since it is all in memory 
