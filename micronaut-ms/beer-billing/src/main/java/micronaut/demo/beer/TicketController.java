@@ -1,31 +1,35 @@
 package micronaut.demo.beer;
 
-import java.util.Optional;
-
-import javax.validation.constraints.NotBlank;
-
+import io.micronaut.context.ApplicationContext;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.sse.Event;
-
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.http.sse.Event;
 import io.micronaut.runtime.server.EmbeddedServer;
-//import io.micronaut.tracing.annotation.ContinueSpan;
-//import io.micronaut.tracing.annotation.NewSpan;
+import io.micronaut.tracing.annotation.ContinueSpan;
+import io.micronaut.tracing.annotation.NewSpan;
 import io.micronaut.tracing.annotation.SpanTag;
 import io.micronaut.validation.Validated;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import javax.inject.Inject;
-
+import micronaut.demo.beer.event.TransactionDto;
+import micronaut.demo.beer.event.TransactionRegisterEvent;
+import micronaut.demo.beer.kafka.EventPublisher;
 import micronaut.demo.beer.model.BeerItem;
 import micronaut.demo.beer.model.Ticket;
 import micronaut.demo.beer.service.BillService;
 import micronaut.demo.beer.service.CostCalculator;
 import org.reactivestreams.Publisher;
+
+import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
+import java.util.Optional;
+
+//import io.micronaut.tracing.annotation.ContinueSpan;
+//import io.micronaut.tracing.annotation.NewSpan;
 
 
 @Controller("/billing")
@@ -35,6 +39,8 @@ public class TicketController {
 	final EmbeddedServer embeddedServer;
 	final CostCalculator beerCostCalculator;
 	final BillService billService;
+	//static ApplicationContext applicationContext;
+	EventPublisher eventPublisher;
 
 	@Inject
 	public TicketController(EmbeddedServer embeddedServer,
@@ -57,12 +63,29 @@ public class TicketController {
     	    Optional<Ticket> t = getTicketForUser(customerName);
     	    Ticket ticket = t.isPresent() ?  t.get() : new Ticket();
     	    ticket.add(beer);
+
+
+    	    try {
+
+				//EventPublisher client = applicationContext.getBean(EventPublisher.class);
+				eventPublisher.transactionRegisteredEvent(customerName, createEvent(ticket, customerName));
+			} catch (Exception e) {
+				e.printStackTrace();
+				//System.out.println("Errror s \n\n\n\n\n\n\n\n\n\n\n" + );
+
+			}
+
+
 			billService.createBillForCostumer(customerName, ticket);
+
     	    return HttpResponse.ok(beer);
     }
-    
-    @Get("/bill/{customerName}")
-	//@NewSpan("bill")
+	private TransactionRegisterEvent createEvent(Ticket ticket, String username) {
+		return new TransactionRegisterEvent(new TransactionDto(username, ticket));
+	}
+
+	@Get("/bill/{customerName}")
+	@NewSpan("bill")
     public Single<Ticket> bill(@NotBlank String customerName) {
 			Optional<Ticket> t = getTicketForUser(customerName);
     		Ticket ticket = t.isPresent() ?  t.get() : new Ticket();
@@ -71,7 +94,7 @@ public class TicketController {
     }
 
 	@Get("/cost/{customerName}")
-	//@NewSpan("cost")
+	@NewSpan("cost")
 	public Single<Double> cost(@NotBlank String customerName) {
 		Optional<Ticket> t = getTicketForUser(customerName);
 		double cost = t.isPresent() ? beerCostCalculator.calculateCost(t.get()) :
@@ -92,7 +115,7 @@ public class TicketController {
 		});
 	}
 
-	//@ContinueSpan
+	@ContinueSpan
 	private Ticket getNoCostTicket() {
 		BeerItem smallBeer = new BeerItem("Korona", BeerItem.Size.EMPTY);
 		Ticket noCost = new Ticket();
@@ -100,7 +123,7 @@ public class TicketController {
 		return noCost;
 	}
 
-	//@ContinueSpan
+	@ContinueSpan
 	private Optional<Ticket> getTicketForUser(@SpanTag("getTicketForUser") String customerName) {
 		return Optional.ofNullable(billService.getBillForCostumer(customerName));
 	}

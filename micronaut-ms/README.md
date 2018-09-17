@@ -120,6 +120,20 @@ This is how we can be sure by hitting 8082 is the 1 waiter, this line can be dis
 
 This is all to be able to start multiple instances of the waiter.
 
+-> `sudo /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties` 
+
+-> `sudo /opt/kafka/bin/kafka-topics.sh --list --zookeeper localhost:2181`
+
+ ```
+__consumer_offsets
+test
+transaction-registered
+```
+
+
+
+
+
 TODO
 --------
 Unsure if my example test model is correct, i.e. to have multiple tills which each are storing a different set of figures, we in the end have to find all instances of billing service to get a final total for a given user.

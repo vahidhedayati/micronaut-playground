@@ -5,3 +5,9 @@ micronaut:
 #Uncomment to set server port
    # server:
       #  port: 8081
+---
+kafka:
+    #  embedded:
+    #    enabled: true
+    bootstrap:
+        servers: "${KAFKA_HOST:localhost}:${KAFKA_PORT:9092}"
