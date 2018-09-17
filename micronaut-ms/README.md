@@ -144,6 +144,23 @@ Perhaps the problem currently with running multiple billing instances is a local
  
 
 
+An issue was raised with Mauricio, can be found here: https://github.com/mfarache/micronaut-ms/issues/2
+
+
+I was at the time considering or trying to better understand Kafka.
+
+I have now added kafka support to this project which means you also need to be running kafka locally before launching this project.
+
+The issue is that Kafka isn't what I thought it would be or could be used for. 
+
+If I launch 3 instances of the beer-billing, with kafka, only 1 billing application is  actually doing the kafka listening 
+the rest appear to sit idle. Unsure if there are any other trickeries that could be used from https://docs.micronaut.io/snapshot/guide/index.html#messaging.
+
+
+
+
+
+
 
 
  

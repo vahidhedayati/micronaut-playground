@@ -29,4 +29,8 @@ public class TransactionDto {
     public Ticket getTicket() {
         return this.ticket;
     }
+    public String getUsername() {
+        return this.username;
+    }
 }
+

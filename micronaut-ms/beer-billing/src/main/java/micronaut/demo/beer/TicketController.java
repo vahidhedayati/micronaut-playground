@@ -59,28 +59,26 @@ public class TicketController {
     	    return HttpResponse.ok();
     }
 
-    @Post("/addBeer/{customerName}")
-    public HttpResponse<BeerItem> addBeerToCustomerBill(@Body BeerItem beer, @NotBlank String customerName) {
-    	    Optional<Ticket> t = getTicketForUser(customerName);
-    	    Ticket ticket = t.isPresent() ?  t.get() : new Ticket();
-    	    ticket.add(beer);
+	@Post("/addBeer/{customerName}")
+	public HttpResponse<BeerItem> addBeerToCustomerBill(@Body BeerItem beer, @NotBlank String customerName) {
+		//Optional<Ticket> t = getTicketForUser(customerName);
+		//Ticket ticket = t.isPresent() ?  t.get() : new Ticket();
+		//ticket.add(beer);
+		eventPublisher.beerRegisteredEvent(customerName,beer);
+		//eventPublisher.transactionRegisteredEvent(customerName, createEvent(ticket, customerName));
 
+		/**
+		 * Below logic moved to TransactionRegisteredListener.java
+		 *
+		 * This way hopefully all nodes running beer-billing will all pick up same transaction and keep the
+		 * cost of a given client as same cost all throughout the nodes...
+		 *
+		 *
+		 */
+		///billService.createBillForCostumer(customerName, ticket);
 
-    	  // try {
-
-				//EventPublisher client = applicationContext.getBean(EventPublisher.class);
-				eventPublisher.transactionRegisteredEvent(customerName, createEvent(ticket, customerName));
-			//} catch (Exception e) {
-			//	e.printStackTrace();
-				//System.out.println("Errror s \n\n\n\n\n\n\n\n\n\n\n" + );
-
-			//}
-
-
-			billService.createBillForCostumer(customerName, ticket);
-
-    	    return HttpResponse.ok(beer);
-    }
+		return HttpResponse.ok(beer);
+	}
 	private TransactionRegisterEvent createEvent(Ticket ticket, String username) {
 		return new TransactionRegisterEvent(new TransactionDto(username, ticket));
 	}

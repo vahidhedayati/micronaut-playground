@@ -14,34 +14,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MapBillService implements BillService {
 
-    //EventPublisher eventPublisher;
-  //  static ApplicationContext applicationContext;
 
     Map<String, Ticket> billsPerCustomer = new HashMap<>();
     public Ticket getBillForCostumer(String username) { return billsPerCustomer.get(username); }
 
     public void  createBillForCostumer(String username, Ticket ticket) {
-
-        //System.out.println ("Kafka service call success \n\n\n\n\n\n\n\n\n\n");
-        /*TransactionDto dto = new TransactionDto();
-        dto.setUsername(username);
-        dto.setTicket(ticket);
-
-        TransactionRegisterEvent tr = new TransactionRegisterEvent();
-        tr.setTransaction(dto);
-        */
-        //System.out.println ("Customer name  "+username+"-0-------------------------------------");
-        // TransactionRegisterEvent eve = createEvent(ticket,username);
-        // System.out.println ("Customer name 222 "+username+"-0-------------------------------------"+eve);
-        //eventPublisher.transactionRegEvent(tr);
-
-        //EventPublisher client = applicationContext.getBean(EventPublisher.class);
-        //client.transactionRegisteredEvent(username, eve);
-        //  eventPublisher.transactionRegisteredEvent(username, eve);
-
         billsPerCustomer.put(username,ticket);
-
-
     };
 
     private TransactionRegisterEvent createEvent(Ticket ticket, String username) {
