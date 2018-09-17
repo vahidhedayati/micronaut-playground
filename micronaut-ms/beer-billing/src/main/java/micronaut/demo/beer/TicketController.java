@@ -40,6 +40,7 @@ public class TicketController {
 	final CostCalculator beerCostCalculator;
 	final BillService billService;
 	//static ApplicationContext applicationContext;
+	@Inject
 	EventPublisher eventPublisher;
 
 	@Inject
@@ -65,15 +66,15 @@ public class TicketController {
     	    ticket.add(beer);
 
 
-    	    try {
+    	  // try {
 
 				//EventPublisher client = applicationContext.getBean(EventPublisher.class);
 				eventPublisher.transactionRegisteredEvent(customerName, createEvent(ticket, customerName));
-			} catch (Exception e) {
-				e.printStackTrace();
+			//} catch (Exception e) {
+			//	e.printStackTrace();
 				//System.out.println("Errror s \n\n\n\n\n\n\n\n\n\n\n" + );
 
-			}
+			//}
 
 
 			billService.createBillForCostumer(customerName, ticket);

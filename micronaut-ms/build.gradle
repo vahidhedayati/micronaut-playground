@@ -44,9 +44,11 @@ subprojects { project ->
                 runtime "org.apache.tomcat:tomcat-jdbc:8.0.44"
                 compile "io.micronaut:discovery-client"
                 // https://mvnrepository.com/artifact/io.micronaut/tracing
-                compile group: 'io.micronaut', name: 'tracing', version: '1.0.0.M4'
+               // compile group: 'io.micronaut', name: 'tracing', version: '1.0.0.M4'
                 // https://mvnrepository.com/artifact/io.micronaut.configuration/kafka
-                compile group: 'io.micronaut.configuration', name: 'kafka', version: '1.0.0.M4'
+                //compile group: 'io.micronaut.configuration', name: 'kafka', version: '1.0.0.M4'
+                compile "io.micronaut:tracing"
+                compile "io.micronaut.configuration:kafka"
 
                 // https://mvnrepository.com/artifact/org.projectlombok/lombok
                 compile group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
