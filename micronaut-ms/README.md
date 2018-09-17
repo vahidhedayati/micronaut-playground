@@ -156,10 +156,239 @@ The issue is that Kafka isn't what I thought it would be or could be used for.
 If I launch 3 instances of the beer-billing, with kafka, only 1 billing application is  actually doing the kafka listening 
 the rest appear to sit idle. Unsure if there are any other trickeries that could be used from https://docs.micronaut.io/snapshot/guide/index.html#messaging.
 
+DONE
+----
+
+Kafka now removed as a requirement but you will need to be running mongoDB instead with this latest push.
+If you review branches there are 2 other branches one running kafka - one pre kafka changes
+
+and now current branch latest running with mongodb. 
+The kafka libraries left alone and simply the listener eventpublisher files have been commented out as kafkalisteners and kafkaclients.
+
+The changes are really in the TicketController which `implements TicketOperations<CostSync>` this has additional implementations in the controller to match interface and offers save/find option against mongo db.
+
+In the segment that delivers actual overall cost - the model is now slightly changed to look up `CostSync`  domain class connected through `Mongo db`.
+The cost returned is now central on all nodes so when I run the test I get back same results from all 3 instances of the beer-billing system:
+
+```
+$ ./test.sh 
+Serving beer to fred1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing fred1 ------------------------------------------------------------
+{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}
+Serving beer to wilma1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing wilma1 ------------------------------------------------------------
+{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}
+Serving beer to barney1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing barney1 ------------------------------------------------------------
+{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}
+Serving beer to betty1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing betty1 ------------------------------------------------------------
+{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}{"cost":117.0,"deskId":14751}
+mx1@mx1-hostname:~/micro-projects/micronaut-playground/micronaut-ms$ ./test.sh 
+Serving beer to fred1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing fred1 ------------------------------------------------------------
+{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}
+Serving beer to wilma1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing wilma1 ------------------------------------------------------------
+{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}
+Serving beer to barney1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing barney1 ------------------------------------------------------------
+{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}
+Serving beer to betty1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing betty1 ------------------------------------------------------------
+{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}{"cost":175.5,"deskId":14751}
+mx1@mx1-hostname:~/micro-projects/micronaut-playground/micronaut-ms$ ./test.sh 
+Serving beer to fred1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing fred1 ------------------------------------------------------------
+{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}
+Serving beer to wilma1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing wilma1 ------------------------------------------------------------
+{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}
+Serving beer to barney1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing barney1 ------------------------------------------------------------
+{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}
+Serving beer to betty1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing betty1 ------------------------------------------------------------
+{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}{"cost":234.0,"deskId":14751}
+    
+    
+    
+$ ./test.sh 
+Serving beer to fred1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing fred1 ------------------------------------------------------------
+{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}
+Serving beer to wilma1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing wilma1 ------------------------------------------------------------
+{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}
+Serving beer to barney1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing barney1 ------------------------------------------------------------
+{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}
+Serving beer to betty1 ------------------------------------------------------------
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+{"name":"mahou","size":"MEDIUM"}
+Billing betty1 ------------------------------------------------------------
+{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}{"cost":292.5,"deskId":14751}
 
 
-
-
+```
 
 
 
