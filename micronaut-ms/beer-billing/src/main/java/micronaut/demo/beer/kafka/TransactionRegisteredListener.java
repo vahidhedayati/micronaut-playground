@@ -14,8 +14,9 @@ import micronaut.demo.beer.service.BillService;
 
 import java.util.Optional;
 
-@RequiredArgsConstructor
-@KafkaListener(offsetReset = OffsetReset.EARLIEST)///,groupId="billing", threads=10)
+//@RequiredArgsConstructor
+// Disabled Kafka Listener
+//@KafkaListener(offsetReset = OffsetReset.EARLIEST)///,groupId="billing", threads=10)
 public class TransactionRegisteredListener {
 
     final BillService billService;

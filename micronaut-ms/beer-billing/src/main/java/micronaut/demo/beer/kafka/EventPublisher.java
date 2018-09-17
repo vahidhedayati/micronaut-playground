@@ -7,7 +7,8 @@ import micronaut.demo.beer.event.TransactionRegisterEvent;
 import micronaut.demo.beer.event.TransactionTerminationEvent;
 import micronaut.demo.beer.model.BeerItem;
 
-@KafkaClient
+//@KafkaClient
+// Disabled KafaClient
 public interface EventPublisher {
 
 

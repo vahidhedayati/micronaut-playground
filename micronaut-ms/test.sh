@@ -1,5 +1,5 @@
 #!/bin/bash
-declare -a arr=("fred" "wilma" "barney" "betty")
+declare -a arr=("fred1" "wilma1" "barney1" "betty1")
 
 	for i in "${arr[@]}"
 	do

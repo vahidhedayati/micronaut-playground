@@ -19,6 +19,7 @@ public class MapBillService implements BillService {
     public Ticket getBillForCostumer(String username) { return billsPerCustomer.get(username); }
 
     public void  createBillForCostumer(String username, Ticket ticket) {
+
         billsPerCustomer.put(username,ticket);
     };
 
