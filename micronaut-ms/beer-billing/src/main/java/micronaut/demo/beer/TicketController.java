@@ -17,6 +17,7 @@ import io.reactivex.Single;
 import micronaut.demo.beer.model.BeerItem;
 import micronaut.demo.beer.model.Ticket;
 import micronaut.demo.beer.service.BillService;
+import micronaut.demo.beer.service.BootService;
 import micronaut.demo.beer.service.CostCalculator;
 import org.reactivestreams.Publisher;
 
@@ -34,14 +35,17 @@ public class TicketController {
 	final EmbeddedServer embeddedServer;
 	final CostCalculator beerCostCalculator;
 	final BillService billService;
+	final BootService bootService;
 
 	@Inject
 	public TicketController(EmbeddedServer embeddedServer,
 							CostCalculator beerCostCalculator,
-							BillService billService) {
+							BillService billService,
+							BootService bootService) {
 		this.embeddedServer = embeddedServer;
 		this.beerCostCalculator = beerCostCalculator;
 		this.billService = billService;
+		this.bootService=bootService;
 	}
 
 	
@@ -55,21 +59,17 @@ public class TicketController {
 	public HttpResponse<BeerItem> addBeerToCustomerBill(@Body BeerItem beer, @NotBlank String customerName) {
 
 
+		/*
 		Optional<Ticket> t = getTicketForUser(customerName);
 		Ticket ticket = t.isPresent() ?  t.get() : new Ticket();
 		ticket.add(beer);
 
 		billService.createBillForCostumer(customerName, ticket);
+		*/
 
-		String url = "ws://localhost:"+embeddedServer.getPort()+"/ws/"+customerName+"/"+beer.getName()+"/"+beer.getSize().toString();
-		System.out.println(beer.getName()+" "+beer.getSize()+" "+url);
-		try {
-			WebSocketClient client = new WebSocketClient(url);
-			client.open();
-			//client.<String>eval(customerName, beer.getName(),beer.getSize().toString());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+
+		bootService.sendMessage(customerName+":"+beer.getName()+":"+beer.getSize().toString());
+
 
 
 		/**

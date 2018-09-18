@@ -22,6 +22,9 @@ public class MapBillService implements BillService {
     };
 
 
+    public String hello() {
+        return "hello";
+    }
     public String usersInBarMessage() {
         int howManyUsers = size();
         if (howManyUsers==0) {

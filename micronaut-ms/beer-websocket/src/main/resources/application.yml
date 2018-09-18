@@ -1,7 +1,0 @@
-micronaut:
-    application:
-        name: beer-websocket
-                
-#Uncomment to set server port
-    server:
-        port: 8085

@@ -16,19 +16,25 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
-import micronaut.demo.beer.model.BeerItem;
-import micronaut.demo.beer.model.Ticket;
+import micronaut.demo.beer.service.BillService;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
+
 
 public class WebSocketClient {
     private final URI uri;
     private Channel ch;
+    final BillService billService;
+
     private static final EventLoopGroup group = new NioEventLoopGroup();
     WebSocketClientHandler handler;
-    public WebSocketClient(final String uri) {
+
+    @Inject
+    public WebSocketClient(final String uri,BillService billService ) {
         this.uri = URI.create(uri);
+        this.billService=billService;
     }
 
     public void open() throws Exception {
@@ -42,7 +48,7 @@ public class WebSocketClient {
         handler =
                 new WebSocketClientHandler(
                         WebSocketClientHandshakerFactory.newHandshaker(
-                                uri, WebSocketVersion.V13, null, true, new DefaultHttpHeaders()));
+                                uri, WebSocketVersion.V13, null, true, new DefaultHttpHeaders()), billService);
         // uri, WebSocketVersion.V13, null, false, HttpHeaders.EMPTY_HEADERS, 1280000));
 
         b.group(group)
@@ -73,31 +79,6 @@ public class WebSocketClient {
         System.out.println("WebSocket Client connecting");
         ch = b.connect(uri.getHost(), uri.getPort()).sync().channel();
         handler.handshakeFuture().sync();
-
-        // println "-- ${handler.handshakeFuture().awaitUninterruptibly().findResult {}}"
-        /*
-       BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-        while (console.ready()) {
-            String msg = console.readLine();
-            if (msg == null) {
-                break;
-            } else if ("bye".equals(msg.toLowerCase())) {
-                //ch.writeAndFlush(new CloseWebSocketFrame());
-                //ch.closeFuture().sync();
-                break;
-            } else if ("ping".equals(msg.toLowerCase())) {
-                //WebSocketFrame frame = new PingWebSocketFrame(Unpooled.wrappedBuffer(new byte[] { 8, 1, 8, 1 }));
-                //ch.writeAndFlush(frame);
-            } else {
-                WebSocketFrame frame = new TextWebSocketFrame(msg);
-                println "-> ${frame.text()}"
-                //ch.writeAndFlush(frame);
-            }
-        }
-        */
-
-
-
     }
 
     public void close() throws InterruptedException {
@@ -107,7 +88,7 @@ public class WebSocketClient {
         // group.shutdownGracefully();
     }
 
-    public void eval(final String text, String name, String size) throws IOException {
-        ch.writeAndFlush(new TextWebSocketFrame(text+":"+name+":"+size));
+    public void eval(final String text) throws IOException {
+        ch.writeAndFlush(new TextWebSocketFrame(text));
     }
 }

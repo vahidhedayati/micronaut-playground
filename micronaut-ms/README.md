@@ -23,9 +23,10 @@ cd micronaut-ms
 
 ```
 
-Now separatley launch multiple times from other terminals
+Now on separate instances launch beer-billing multiple times :
 
 ```
+./gradlew  beer-billing:run
 ./gradlew  beer-billing:run
 ```
 
@@ -46,33 +47,23 @@ http://localhost:8082/waiter/beer/wilma `{"name":"mahou","size":"MEDIUM"}`
 http://localhost:8082/waiter/bill/wilma `{"cost":11.7,"deskId":8081}`
 
 
-Next test multiple waiters running 
-
-`./gradlew beer-billing:run`
-And again 
-`./gradlew beer-billing:run`
 
 
-
-
-
-
-UPDATE 18th Septh 2018 
+UPDATE 18th September 2018 
 ---
 
-What you will find at the moment is the websocket clients are triggered by  `BootService.java` in `billing application`
-upon the application startup the above websocket groovysocket is a netty socket running on port `9000`.
-It connects through each app upon start up and when one of the billing apps sends a `bootService.sendMessage` 
-The message after a while ends up on the groovysocket app. This then relays it back to
- `HttpServerHandler.allChannels.stream()?.each` which is the collection of connected billing applications.
- Each then get the message back which they need to load up the ticket and add the relevent beer cost back on..
- 
-``` 
-WebSocket Client received message: alpha:mahou:MEDIUM
-```
- 
-At the moment you will see some println showing above on all billing apps  - still needs to be wired in to centralise 
-This means each beer sold is relayed to the socket server then relayed back to each billing app. As many as running.
+The latest branch uses netty websocket on port 9000,  `beer-waiter` transmits to one of the running `beer-billing` instances.
+
+At the point of start up each beer-billing instance register themselves via BootService as a client to the `groovysocket`
+websocket server. They are chat clients connecting upon start to the server.
+
+When a waiter transmits addBeer request - this is transmitted to the groovysocket which then relays it back to all connected 
+websocket clients in which case happes to be as many instances of `beer-billing` that may be running.
+
+Each `beer-billing` application now receives the websocket message firstly transmitted to one of them 
+`WebSocketClientHandler` around line 98 then actually loads in the user ticket and does the calculation that TicketController 
+was originally doing on the instance that received the request from the `beer-waiter` application
+
 
 I think this has its problems as well but it was more about communication flow and which route would be best. There are 
 several branches of this specific application - about 5 in total of different experiments
@@ -82,8 +73,30 @@ several branches of this specific application - about 5 in total of different ex
 > Kafta did something but not what I expected. It  probably be better used to send a message from 1 app to a totally different app. Which in turn uses one of above to distribute to all its online duplicate instances.
 
 
-I will if given chance finish off this websocket - the long winded `groovysocket way` which intialises an additional port, this is not my preferred method
-but is nearly working and doing what I need it to do. The other method in another branch standard socket or something I need to return to and when I get that work socket implementation be far simpler than current 
+
+Branches are:
+[basic: micronaut-ms-b4-kafka](https://github.com/vahidhedayati/micronaut-playground/tree/micronaut-ms-b4-kafka/micronaut-ms)
+
+[kafka: ms-withkafka](https://github.com/vahidhedayati/micronaut-playground/tree/ms-withkafka/micronaut-ms)
+ 
+[mongodb: mongodb](https://github.com/vahidhedayati/micronaut-playground/tree/mongodb/micronaut-ms)
+ 
+ 
+[websocket demo standard websocket: beerwebsocket-demo](https://github.com/vahidhedayati/micronaut-playground/tree/beerwebsocket-demo/micronaut-ms)
+  
+And current master which is using `groovysocket` that processes beer-billing via websockets.
+
+You can use  `git clone https://github.com/vahidhedayati/micronaut-playground.git -b micronaut-ms-b4-kafka`
+or `git clone https://github.com/vahidhedayati/micronaut-playground.git -b ms-withkafka` or what ever branch name you desire to take
+a look through - the files changes will be in this folder micronaut-ms folder of the main project above.
+
+
+Please look further down at older notes / discussions, please feel free to run the test.sh script with the nettysocket
+implementation currently, ensure you start multiple instances of the beer-billing to appreciate what is going on.
+  
+
+ 
+ 
 
 
 
@@ -91,26 +104,6 @@ but is nearly working and doing what I need it to do. The other method in anothe
 --------------------------
 
 Rest of this relates to older branches doing other tests - at the moment it is concepts above
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

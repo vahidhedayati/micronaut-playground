@@ -22,74 +22,21 @@ class WebSocketHandler  extends SimpleChannelInboundHandler<WebSocketFrame> {
             if (msg instanceof BinaryWebSocketFrame) {
                 System.out.println("BinaryWebSocketFrame Received : ");
                 System.out.println(((BinaryWebSocketFrame) msg).content());
-
             }  else if (msg instanceof TextWebSocketFrame) {
-
                 //ctx.write(msg.retain());
-
                 final String text = ((TextWebSocketFrame) msg).text();
-                System.out.println("Received text frame : "+text);
-
-                /**
-                 *
-                 * This is a custom method built into the demo
-                 * which simply returns the user object as a map back to caller
-                 * when lookup is triggered
-                 */
-
-                if (text.contains(':')) {
-                    def actions = text.split(':')
-                    String action = actions[0]
-                    String  name = actions[1]
-                    String  size = actions[2]
-
-                  //              ctx.channel().writeAndFlush(
-                    //                    new TextWebSocketFrame(text))
-
-
-                            if (text) {
-                                println "SENDING >${text}<"
-                                ctx.channel().writeAndFlush(
-                                        new TextWebSocketFrame(text));
-                                /*allChannels.stream()
-                                        .filter(c -> c != ctx.channel())
-                                        .forEach(c -> c.writeAndFlush(frame));
-                                        */
-                                //HttpServerHandler.allChannels?.each { c->
-                                 //   println "999999999999 working on ${c}"
-                                  //  c.writeAndFlush(textFrame.text());
-                                //}
-                                HttpServerHandler.allChannels.stream()?.each { c->
-                                    println "working on ${c}"
-                                    c.writeAndFlush(new TextWebSocketFrame(text));
-                                }
-                               /* Channel incoming = ctx.channel();
-                                for (Channel channel : allChannels.stream()) {
-                                    System.out.println("got "+channel);
-                                    if (channel != incoming){
-                                        ///println "writing to channel ${channel}"
-                                        channel.writeAndFlush(textFrame.text());
-                                    }
-                                }
-                                */
-                            }
-
+                if (text) {
+                    System.out.println("Received text frame : "+text);
+                    //This resends to all connected billing apps
+                    try {
+                        HttpServerHandler.allChannels.stream()?.each { c->
+                            c.writeAndFlush(new TextWebSocketFrame(text));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                 }
-
-
-
-
-                //Write to own channel
-
-                //System.out.println(((TextWebSocketFrame) msg).text());
-                /*
-                Java way -- above groovy way
-                allChannels.stream()
-                        .filter(c -> c != ctx.channel())
-                        .forEach(c -> c.writeAndFlush(frame));
-                        */
-
             } else if (msg instanceof PingWebSocketFrame) {
                 System.out.println("PingWebSocketFrame Received : ");
                 System.out.println(((PingWebSocketFrame) msg).content());

@@ -8,4 +8,6 @@ public interface BillService {
     void  createBillForCostumer(String username, Ticket ticket) ;
     String usersInBarMessage() ;
 
+    String hello();
+
 }
