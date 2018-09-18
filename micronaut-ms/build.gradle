@@ -48,7 +48,7 @@ subprojects { project ->
                 // https://mvnrepository.com/artifact/io.micronaut.configuration/kafka
                 //compile group: 'io.micronaut.configuration', name: 'kafka', version: '1.0.0.M4'
                 compile "io.micronaut:tracing"
-                compile "io.micronaut.configuration:kafka"
+                //compile "io.micronaut.configuration:kafka"
 
 
 

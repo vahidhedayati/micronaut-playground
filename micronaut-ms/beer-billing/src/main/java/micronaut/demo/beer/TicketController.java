@@ -1,9 +1,7 @@
 package micronaut.demo.beer;
 
-import com.mongodb.client.model.Aggregates;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import io.micronaut.context.ApplicationContext;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
@@ -21,9 +19,6 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import micronaut.demo.beer.domain.CostSync;
 import micronaut.demo.beer.domain.CostSyncConfiguration;
-import micronaut.demo.beer.event.TransactionDto;
-import micronaut.demo.beer.event.TransactionRegisterEvent;
-import micronaut.demo.beer.kafka.EventPublisher;
 import micronaut.demo.beer.model.BeerItem;
 import micronaut.demo.beer.model.Ticket;
 import micronaut.demo.beer.service.BillService;
@@ -33,7 +28,6 @@ import org.reactivestreams.Publisher;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +35,6 @@ import static com.mongodb.client.model.Filters.eq;
 
 //import io.micronaut.tracing.annotation.ContinueSpan;
 //import io.micronaut.tracing.annotation.NewSpan;
-import static com.mongodb.client.model.Filters.eq;
 
 @Controller("/billing")
 @Validated
@@ -139,9 +132,7 @@ public class TicketController implements TicketOperations<CostSync> {
 
 		return HttpResponse.ok(beer);
 	}
-	private TransactionRegisterEvent createEvent(Ticket ticket, String username) {
-		return new TransactionRegisterEvent(new TransactionDto(username, ticket));
-	}
+
 
 	@Get("/bill/{customerName}")
 	@NewSpan("bill")

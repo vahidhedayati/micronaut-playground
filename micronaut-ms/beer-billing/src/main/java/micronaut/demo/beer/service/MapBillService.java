@@ -1,8 +1,6 @@
 package micronaut.demo.beer.service;
 
 import lombok.RequiredArgsConstructor;
-import micronaut.demo.beer.event.TransactionDto;
-import micronaut.demo.beer.event.TransactionRegisterEvent;
 import micronaut.demo.beer.model.Ticket;
 
 import javax.inject.Singleton;
@@ -23,9 +21,6 @@ public class MapBillService implements BillService {
         billsPerCustomer.put(username,ticket);
     };
 
-    private TransactionRegisterEvent createEvent(Ticket ticket, String username) {
-        return new TransactionRegisterEvent(new TransactionDto(username, ticket));
-    }
 
     public String usersInBarMessage() {
         int howManyUsers = size();

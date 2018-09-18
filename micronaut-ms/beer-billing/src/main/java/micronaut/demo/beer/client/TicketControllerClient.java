@@ -1,7 +1,5 @@
 package micronaut.demo.beer.client;
 
-import javax.validation.constraints.NotBlank;
-
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Get;
@@ -10,6 +8,8 @@ import io.micronaut.http.client.Client;
 import io.reactivex.Single;
 import micronaut.demo.beer.model.BeerItem;
 import micronaut.demo.beer.model.Ticket;
+
+import javax.validation.constraints.NotBlank;
 
 @Client(id = "billing", path = "/billing")
 public interface TicketControllerClient {
