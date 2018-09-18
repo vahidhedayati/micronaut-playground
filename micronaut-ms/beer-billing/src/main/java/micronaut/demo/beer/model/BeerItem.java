@@ -24,7 +24,5 @@ public class BeerItem {
 		this.name = name;
 		this.size = size;
 	}
-	
-
 
 }

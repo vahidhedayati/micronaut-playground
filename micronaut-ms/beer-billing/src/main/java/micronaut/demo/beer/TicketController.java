@@ -1,7 +1,5 @@
 package micronaut.demo.beer;
 
-import com.mongodb.reactivestreams.client.MongoClient;
-import com.mongodb.reactivestreams.client.MongoCollection;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
@@ -15,10 +13,7 @@ import io.micronaut.tracing.annotation.NewSpan;
 import io.micronaut.tracing.annotation.SpanTag;
 import io.micronaut.validation.Validated;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Single;
-import micronaut.demo.beer.domain.CostSync;
-import micronaut.demo.beer.domain.CostSyncConfiguration;
 import micronaut.demo.beer.model.BeerItem;
 import micronaut.demo.beer.model.Ticket;
 import micronaut.demo.beer.service.BillService;
@@ -26,81 +21,27 @@ import micronaut.demo.beer.service.CostCalculator;
 import org.reactivestreams.Publisher;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.util.List;
 import java.util.Optional;
-
-import static com.mongodb.client.model.Filters.eq;
 
 //import io.micronaut.tracing.annotation.ContinueSpan;
 //import io.micronaut.tracing.annotation.NewSpan;
 
 @Controller("/billing")
 @Validated
-public class TicketController implements TicketOperations<CostSync> {
+public class TicketController {
 
 	final EmbeddedServer embeddedServer;
 	final CostCalculator beerCostCalculator;
 	final BillService billService;
-	private final CostSyncConfiguration configuration;
-	private MongoClient mongoClient;
-
-	@Override
-	public Single<List<CostSync>> list() {
-		return Flowable.fromPublisher(
-				getCollection()
-						.find()
-		).toList();
-	}
-
-	@Override
-	public Single<List<CostSync>> byUsername(String name) {
-		return Flowable.fromPublisher(
-				getCollection()
-						.find(eq("username", name))
-		).toList();
-	}
-
-	//@Inject
-	//EventPublisher eventPublisher;
-	@Override
-	public Maybe<CostSync> find(String username) {
-		return Flowable.fromPublisher(
-				getCollection()
-						.find(eq("username", username))
-						.limit(1)
-		).firstElement();
-	}
-
-
-	@Override
-	public Single<CostSync> save(@Valid CostSync pet) {
-		return find(pet.getUsername())
-				.switchIfEmpty(
-						Single.fromPublisher(getCollection().insertOne(pet))
-								.map(success -> pet)
-				);
-
-	}
-
-	private MongoCollection<CostSync> getCollection() {
-		return mongoClient
-				.getDatabase(configuration.getDatabaseName())
-				.getCollection(configuration.getCollectionName(), CostSync.class);
-	}
-
 
 	@Inject
 	public TicketController(EmbeddedServer embeddedServer,
 							CostCalculator beerCostCalculator,
-							BillService billService, CostSyncConfiguration configuration,
-							MongoClient mongoClient) {
+							BillService billService) {
 		this.embeddedServer = embeddedServer;
 		this.beerCostCalculator = beerCostCalculator;
 		this.billService = billService;
-		this.configuration = configuration;
-		this.mongoClient = mongoClient;
 	}
 
 	
@@ -119,6 +60,16 @@ public class TicketController implements TicketOperations<CostSync> {
 		ticket.add(beer);
 
 		billService.createBillForCostumer(customerName, ticket);
+
+		String url = "ws://localhost:"+embeddedServer.getPort()+"/ws/"+customerName+"/"+beer.getName()+"/"+beer.getSize().toString();
+		System.out.println(beer.getName()+" "+beer.getSize()+" "+url);
+		try {
+			WebSocketClient client = new WebSocketClient(url);
+			client.open();
+			//client.<String>eval(customerName, beer.getName(),beer.getSize().toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 
 		/**
@@ -150,22 +101,7 @@ public class TicketController implements TicketOperations<CostSync> {
 		double cost = t.isPresent() ? beerCostCalculator.calculateCost(t.get()) :
 										  beerCostCalculator.calculateCost(getNoCostTicket());
 
-
-		//We save the cost to MongoDB
-
-		save(new CostSync(customerName,cost));
-
-		//
-		CostSync found = find(customerName).blockingGet();
-		if (found!=null) {
-			System.out.println("WE Have from Mongo "+found.toString());
-			return Single.just(found.getCost());
-		} else {
-			System.out.println("WE Have from NO Mongo DB JUST COST "+cost);
-			return Single.just(Double.valueOf(cost));
-		}
-
-
+		return Single.just(Double.valueOf(cost));
 	}
 
 	@Get(uri = "/users", produces = MediaType.TEXT_EVENT_STREAM)

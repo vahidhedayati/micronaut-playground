@@ -1,13 +1,8 @@
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.2"
-        classpath "io.spring.gradle:dependency-management-plugin:1.0.5.RELEASE"
-    }
+plugins {
+    id "io.spring.dependency-management" version "1.0.6.RELEASE"
+    id "com.github.johnrengelman.shadow" version "2.0.4"
+    id "net.ltgt.apt-eclipse" version "0.18"
+    id "net.ltgt.apt-idea" version "0.18"
 }
 subprojects { project ->
 
@@ -31,7 +26,7 @@ subprojects { project ->
 
         dependencyManagement {
             imports {
-                mavenBom "io.micronaut:bom:$projectVersion"
+                mavenBom 'io.micronaut:bom:1.0.0.BUILD-SNAPSHOT'
             }
         }
 
