@@ -1,46 +1,43 @@
 package micronaut.demo.beer;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import io.micronaut.http.MediaType;
+import io.micronaut.websocket.WebSocketSession;
 import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
-import io.micronaut.websocket.WebSocketSession;
-import micronaut.demo.beer.model.BeerItem;
-import micronaut.demo.beer.model.Ticket;
 import org.reactivestreams.Publisher;
+
 import java.util.function.Predicate;
 
-@ServerWebSocket("/ws/{username}/{beerName}/{size}")
+@ServerWebSocket("/ws/{hostName}")
 public class TransactionWebSocket {
     //String ticket,
     @OnOpen
-    public Publisher<String> onOpen(String username, String beerName, String size, WebSocketSession session) {
-        String msg = "" + username + ":"+beerName+':'+size;
+    public Publisher<String> onOpen(String hostName, WebSocketSession session) {
+        String msg = "" + hostName; ///+ ":"+beerName+':'+size;
         //BeerItem.Size.valueOf(size)
         System.out.print("________________________"+msg);
 
-        return session.send("{ username:"+username+", beerName:"+beerName+", size: "+size+"}", MediaType.APPLICATION_JSON_TYPE);
+        return session.send("{ hostName:"+hostName+"}", MediaType.APPLICATION_JSON_TYPE);
     }
 
     @OnMessage
     public Publisher<String> onMessage(
-            JSONPObject username,
+            String message,
             WebSocketSession session
     ) {
        //JsonParser jsonParser = new JsonFactory().createJsonParser(username);
 
 
 
-        String msg = "[" + username.getClass() + "] ";//+beerName;// + beerName+' '+size;
-        System.out.println(msg+"1");
-    //    return session.send(msg);
-     return null;
+        String msg = "[" + message+ "] ";//+beerName;// + beerName+' '+size;
+        System.out.println(msg+" :::::1");
+
+        //TODO - this is currently I think sending backto itself rather than broadcasting semi working
+        return session.send(msg);
+
+     //return null;
     }
 
     /*

@@ -1,3 +1,4 @@
 include "beer-waiter"
 include "beer-billing"
-//include "testsocket"
+include "beer-websocket"
+//include "groovysocket"

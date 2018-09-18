@@ -19,7 +19,8 @@ To run 1 instance of thes beer billing waiter instances run this from within thi
 ```
 cd micronaut-ms
 
-./gradlew beer-waiter:run beer-billing:run --parallel
+./gradlew beer-waiter:run beer-billing:run beer-websocket:run --parallel
+
 ```
 
 
