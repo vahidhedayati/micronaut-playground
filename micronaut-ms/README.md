@@ -19,12 +19,18 @@ To run 1 instance of thes beer billing waiter instances run this from within thi
 ```
 cd micronaut-ms
 
-./gradlew beer-waiter:run beer-billing:run beer-websocket:run --parallel
+./gradlew beer-waiter:run  groovysock:run --parallel
 
 ```
 
+Now separatley launch multiple times from other terminals
 
-Now open brower hit:
+```
+./gradlew  beer-billing:run
+```
+
+
+Now open browser hit:
 
 http://localhost:8082/waiter/beer/fred `{"name":"mahou","size":"MEDIUM"}`
 
@@ -45,6 +51,68 @@ Next test multiple waiters running
 `./gradlew beer-billing:run`
 And again 
 `./gradlew beer-billing:run`
+
+
+
+
+
+
+UPDATE 18th Septh 2018 
+---
+
+What you will find at the moment is the websocket clients are triggered by  `BootService.java` in `billing application`
+upon the application startup the above websocket groovysocket is a netty socket running on port `9000`.
+It connects through each app upon start up and when one of the billing apps sends a `bootService.sendMessage` 
+The message after a while ends up on the groovysocket app. This then relays it back to
+ `HttpServerHandler.allChannels.stream()?.each` which is the collection of connected billing applications.
+ Each then get the message back which they need to load up the ticket and add the relevent beer cost back on..
+ 
+``` 
+WebSocket Client received message: alpha:mahou:MEDIUM
+```
+ 
+At the moment you will see some println showing above on all billing apps  - still needs to be wired in to centralise 
+This means each beer sold is relayed to the socket server then relayed back to each billing app. As many as running.
+
+I think this has its problems as well but it was more about communication flow and which route would be best. There are 
+several branches of this specific application - about 5 in total of different experiments
+
+> Mongo DB would probably be cleanest way and probably worth thinking more clearly about what would need to be stored.
+> Sockets is probably next up for relaying the map across all nodes running billing
+> Kafta did something but not what I expected. It  probably be better used to send a message from 1 app to a totally different app. Which in turn uses one of above to distribute to all its online duplicate instances.
+
+
+I will if given chance finish off this websocket - the long winded `groovysocket way` which intialises an additional port, this is not my preferred method
+but is nearly working and doing what I need it to do. The other method in another branch standard socket or something I need to return to and when I get that work socket implementation be far simpler than current 
+
+
+
+
+--------------------------
+
+Rest of this relates to older branches doing other tests - at the moment it is concepts above
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Then run the `test.sh` script  watch all 3 billing systems 
