@@ -1,5 +1,0 @@
-profile: service
-defaultPackage: groovysocket
----
-testFramework: spock
-sourceLanguage: groovy

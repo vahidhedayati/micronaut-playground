@@ -19,7 +19,7 @@ public class BeerItem {
 		return size;
 	}
 
-	public BeerItem(String name, Size size) {
+	public BeerItem(String name, BeerItem.Size size) {
 		super();
 		this.name = name;
 		this.size = size;

@@ -1,20 +1,44 @@
 package micronaut.demo.beer;
 
+import io.micronaut.tracing.annotation.ContinueSpan;
+import io.micronaut.tracing.annotation.SpanTag;
 import io.netty.channel.*;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
+import io.netty.util.concurrent.GlobalEventExecutor;
+import micronaut.demo.beer.model.BeerItem;
+import micronaut.demo.beer.model.Ticket;
+import micronaut.demo.beer.service.BillService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.util.Optional;
 
 public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketClientHandler.class);
 
     private final WebSocketClientHandshaker handshaker;
+
+    final BillService billService;
     private ChannelPromise handshakeFuture;
-    //private static final ChannelGroup channels = new DefaultChannelGroup();
-    public WebSocketClientHandler(final WebSocketClientHandshaker handshaker) {
+    private static final ChannelGroup channels = new DefaultChannelGroup(
+            GlobalEventExecutor.INSTANCE);
+
+    /*
+    public WebSocketClientHandler(final WebSocketClientHandshaker handshaker , BillService billService) {
         this.handshaker = handshaker;
+        this.billService=billService;
+    }
+    */
+
+    @Inject
+    public WebSocketClientHandler(final WebSocketClientHandshaker handshaker, BillService billService) {
+        this.handshaker = handshaker;
+        this.billService=billService;
     }
 
     public ChannelFuture handshakeFuture() {
@@ -40,12 +64,8 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt == WebSocketClientProtocolHandler.ClientHandshakeStateEvent
                 .HANDSHAKE_COMPLETE) {
-            //SubscribeRequest request = new SubscribeRequest(factory, products);
-            //TextWebSocketFrame frame = request.encodeFrame();
-            //System.out.println("new block-- ${evt.toString()}"
             ctx.channel().writeAndFlush(evt);
         } else {
-            //println "old block"
             super.userEventTriggered(ctx, evt);
         }
     }
@@ -74,36 +94,40 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
         WebSocketFrame frame = (WebSocketFrame) msg;
         if (frame instanceof TextWebSocketFrame) {
-            //ctx.write(frame.retain());
             TextWebSocketFrame textFrame = (TextWebSocketFrame) frame;
-            //JsonParser jsonParser = new JsonFactory().createJsonParser(textFrame.text());
-            //while(jsonParser.nextToken()!= JsonToken.END_OBJECT) {
-              //  String name = jsonParser.getCurrentName();
-               // System.out.println("==="+name);
+             //System.out.println("WebSocket Client received message: " + textFrame.text()+"\n\n\n\n\n\n\n\n\n\n");
+            //ctx.channel().writeAndFlush();
+            String content = textFrame.text();
+            //System.out.println("Websocket Content "+content);//+
+            if (content.indexOf(':')>-1) {
+                String[] parts = content.split(":");
+                String username=parts[0];
+                String beerName=parts[1];
+               // BeerItem.Size beerSize=BeerItem.Size.MEDIUM;
+                if (parts.length>2) {
+                    String beerSize=parts[2];
 
-            //}
 
 
-            System.out.println("WebSocket Client received message: " + textFrame.text()+"\n\n\n\n\n\n\n\n\n\n");
-            //ctx.channel().writeAndFlush(msg)
-            ctx.channel().writeAndFlush(textFrame.text());
+                /**
+                 * This is the logic now from TicketController.java - being executed by
+                 * each WebsocketClientHander on each running instance of the beer-billing application
+                 *
+                 *
+                 */
 
-            //ch.write(frame);
-            //ch.flush()
-
-            /*Channel incoming = ctx.channel();
-            for (Channel channel : channels) {
-                println "got ${channel}"
-                if (channel != incoming){
-                    println "writing to channel ${channel}"
-                    channel.write("[" + incoming.remoteAddress() + "]" + textFrame.text() );
+              //  System.out.println("Billing "+username+" beerName "+beerName);//
+                    Optional<Ticket> t = getTicketForUser(username);
+                    BeerItem beer = new BeerItem(beerName,BeerItem.Size.valueOf(beerSize));// );
+                    Ticket ticket = t.isPresent() ?  t.get() : new Ticket();
+                    ticket.add(beer);
+                    System.out.println("Billing "+username+" ticket "+ticket+ " size:"+beerSize);
+                    billService.createBillForCostumer(username, ticket);
                 }
-            }
-            channels.remove(ctx.channel());
-            */
 
-            //  ctx.write(textFrame.text());
-            //ctx.channel().flush();
+            }
+
+
         } else if (frame instanceof PongWebSocketFrame) {
             System.out.println("WebSocket Client received pong");
         } else if (frame instanceof CloseWebSocketFrame) {
@@ -112,11 +136,13 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         }
 
     }
-
+    @ContinueSpan
+    private Optional<Ticket> getTicketForUser(@SpanTag("getTicketForUser") String customerName) {
+        return Optional.ofNullable(billService.getBillForCostumer(customerName));
+    }
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
         cause.printStackTrace();
-
         if (!handshakeFuture.isDone()) {
             handshakeFuture.setFailure(cause);
         }
