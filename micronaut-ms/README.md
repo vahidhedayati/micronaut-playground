@@ -49,8 +49,16 @@ http://localhost:8082/waiter/bill/wilma `{"cost":11.7,"deskId":8081}`
 
 Then run the `test.sh` script  watch all 3 billing systems 
 
+Videos
+----
 
-I have uploaded a video on you tube based on this branch:[youtube: micronaut : micronaut-ms websocket demo of beer-billing and beer-waiter](https://www.youtube.com/watch?v=p96gYPVgPB8)
+I have uploaded a video on you tube based on this branch:
+
+1. [YouTube: micronaut : micronaut-ms websocket demo of beer-billing and beer-waiter](https://www.youtube.com/watch?v=p96gYPVgPB8)
+
+2. [YouTube: Part 2 this explains latest changes centralised websockets](https://www.youtube.com/watch?v=aQ0rNdIVq1A)
+
+
 
 Despite the tests on the video the actual product appears to work really well whilst I am not recording so something perhaps resources on PC stops it from working whilst demoing
 
@@ -117,3 +125,33 @@ Billing betty1 ------------------------------------------------------------
 The websockerts has transmitted the same cost to all 3 instances of the beer-billing application.
 
 
+Branches are:
+
+[Main branch: beerwebsocket-demo](https://github.com/vahidhedayati/micronaut-playground/tree/beerwebsocket-demo)
+[basic: micronaut-ms-b4-kafka](https://github.com/vahidhedayati/micronaut-playground/tree/micronaut-ms-b4-kafka/micronaut-ms)
+
+[kafka: ms-withkafka](https://github.com/vahidhedayati/micronaut-playground/tree/ms-withkafka/micronaut-ms)
+ 
+[mongodb: mongodb](https://github.com/vahidhedayati/micronaut-playground/tree/mongodb/micronaut-ms)
+ 
+ 
+[websocket demo standard websocket: video1-rev](https://github.com/vahidhedayati/micronaut-playground/tree/video1-rev)
+
+  
+And current master which is using `groovysocket` that processes beer-billing via websockets.
+
+To get this latest code : `git clone https://github.com/vahidhedayati/micronaut-playground.git -b beerwebsocket-demo`
+
+You can use  `git clone https://github.com/vahidhedayati/micronaut-playground.git -b micronaut-ms-b4-kafka`
+or `git clone https://github.com/vahidhedayati/micronaut-playground.git -b ms-withkafka` or what ever branch name you desire to take
+a look through - the files changes will be in this folder micronaut-ms folder of the main project above.
+
+
+
+
+
+An issue was raised with Mauricio, can be found here: https://github.com/mfarache/micronaut-ms/issues/2
+
+
+>All of this is really attempts to make the technology work, I am unsure if some of the things done are best practise.
+>It is more theory based
