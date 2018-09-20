@@ -14,6 +14,7 @@ import io.micronaut.tracing.annotation.SpanTag;
 import io.micronaut.validation.Validated;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import micronaut.demo.beer.client.SocketControllerClient;
 import micronaut.demo.beer.model.BeerItem;
 import micronaut.demo.beer.model.Ticket;
 import micronaut.demo.beer.service.BillService;
@@ -36,16 +37,18 @@ public class TicketController {
 	final CostCalculator beerCostCalculator;
 	final BillService billService;
 	final BootService bootService;
+	SocketControllerClient socketControllerClient;
 
 	@Inject
 	public TicketController(EmbeddedServer embeddedServer,
 							CostCalculator beerCostCalculator,
 							BillService billService,
-							BootService bootService) {
+							BootService bootService,SocketControllerClient socketControllerClient) {
 		this.embeddedServer = embeddedServer;
 		this.beerCostCalculator = beerCostCalculator;
 		this.billService = billService;
 		this.bootService=bootService;
+		this.socketControllerClient=socketControllerClient;
 	}
 	
 	@Get("/reset/{customerName}")
@@ -59,30 +62,25 @@ public class TicketController {
 
 
 		/*
+
+		// Original code here
+
 		Optional<Ticket> t = getTicketForUser(customerName);
 		Ticket ticket = t.isPresent() ?  t.get() : new Ticket();
 		ticket.add(beer);
-
 		billService.createBillForCostumer(customerName, ticket);
-
 		*/
 
 
-		bootService.sendMessage(customerName+":"+beer.getName()+":"+beer.getSize().toString());
+		//This is using http client to send a socket message via http that goes via consul to choose a socket server
+		socketControllerClient.addBeerToCustomerBill(customerName+":"+beer.getName()+":"+beer.getSize().toString());
+
+
+		//This was using unsafe thread method connected to single instance
+		//bootService.sendMessage(customerName+":"+beer.getName()+":"+beer.getSize().toString());
 
 
 
-		/*
-		String url = "ws://localhost:"+embeddedServer.getPort()+"/ws/"+customerName+"/"+beer.getName()+"/"+beer.getSize().toString();
-		System.out.println(beer.getName()+" "+beer.getSize()+" "+url);
-		try {
-			WebSocketClient client = new WebSocketClient(url);
-			client.open();
-			//client.<String>eval(customerName, beer.getName(),beer.getSize().toString());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		*/
 
 
 		/**

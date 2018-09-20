@@ -13,8 +13,8 @@ import org.reactivestreams.Publisher;
 import javax.inject.Inject;
 import java.util.ArrayList;
 
-@ServerWebSocket("/ws/{hostName}")
-public class TransactionWebSocket  {
+@ServerWebSocket("/ls/{hostName}")
+public class LocalWebSocket {
 
     @Inject
     BootService bootService;
@@ -23,12 +23,14 @@ public class TransactionWebSocket  {
 
     @OnOpen
     public Publisher<String> onOpen(String hostName, WebSocketSession session) {
+        if (!hostName.startsWith("SEND_")) {
+            sessions.add(session);
+        }
 
-        System.out.print("Socket connection from: "+hostName+"\n");
-        sessions.add(session);
 
         //Share sessions triggers all running instances of this app to share session ids with each other
-        bootService.shareSessions();
+       // bootService.shareSessions();
+        //myBroadCast("BROADCAST_SESSIONS");
 
 
         return session.send("{ hostName:"+hostName+"}", MediaType.APPLICATION_JSON_TYPE);
@@ -36,8 +38,7 @@ public class TransactionWebSocket  {
 
     @OnMessage
     public Publisher<String> onMessage(String message, WebSocketSession session) {
-        //TODO - this is currently I think sending backto itself rather than broadcasting semi working
-       // return session.broadcast(msg);
+
         for (int i = 0; i < sessions.size(); i++) {
             WebSocketSession sess = sessions.get(i);
             if (sess.getId()!=session.getId()) {
@@ -48,10 +49,9 @@ public class TransactionWebSocket  {
         //return  session.broadcast(msg, MediaType.APPLICATION_JSON_TYPE);
         return  session.send(message);
     }
-
     @OnMessage
     public Publisher<ArrayList<?>> onMessage(ArrayList<?> message, WebSocketSession session) {
-        System.out.println("WE HAVE ARRAY IN OTHER");
+        System.out.println("WE HAVE ARRAY");
         for (int i = 0; i < sessions.size(); i++) {
             WebSocketSession sess = sessions.get(i);
             if (sess.getId()!=session.getId()) {
@@ -70,10 +70,10 @@ public class TransactionWebSocket  {
      * @param message
      */
 
+
     public static void myBroadCast(String message) {
         for (int i = 0; i < sessions.size(); i++) {
-            System.out.println(sessions.get(i).getId()+"-- sending a message "+message);
-            sessions.get(i).sendAsync(message);
+            sessions.get(i).sendAsync( new TextWebSocketFrame(message));
         }
     }
 
@@ -88,8 +88,8 @@ public class TransactionWebSocket  {
 
 
     @OnClose
-    public Publisher<String> onClose(String username, WebSocketSession session) {
-        String msg = "[" + username + "] Disconnected!";
+    public Publisher<String> onClose(WebSocketSession session) {
+        String msg = "[] Disconnected!";
         sessions.remove(session);
         return session.send(msg);
     }

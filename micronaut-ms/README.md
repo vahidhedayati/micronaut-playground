@@ -22,7 +22,7 @@ cd micronaut-ms
 ./gradlew beer-waiter:run  beer-websocket:run --parallel
 
 ```
-Then on separaete instances launch the beer-billing
+Then on separate instances launch the beer-billing
 ```
 ./gradlew beer-billing:run
 ./gradlew beer-billing:run
@@ -46,17 +46,9 @@ http://localhost:8082/waiter/beer/wilma `{"name":"mahou","size":"MEDIUM"}`
 http://localhost:8082/waiter/bill/wilma `{"cost":11.7,"deskId":8081}`
 
 
-Next test multiple waiters running 
-
-`./gradlew beer-billing:run`
-And again 
-`./gradlew beer-billing:run`
-
 
 Then run the `test.sh` script  watch all 3 billing systems 
 
-
-Please look through screen shots for further details and running tests locally
 
 I have uploaded a video on you tube based on this branch:[youtube: micronaut : micronaut-ms websocket demo of beer-billing and beer-waiter](https://www.youtube.com/watch?v=p96gYPVgPB8)
 
