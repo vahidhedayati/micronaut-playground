@@ -14,7 +14,7 @@ To run first either install consul locally and run `./consul agent dev`
 or if you have installed docker simply run `sudo docker run -p 8500:8500 consul`
 
 
-To run 1 instance of thes beer billing waiter instances run this from within this project folder:
+1. To run 1 instance of thes beer billing waiter instances run this from within this project folder:
 
 ```
 cd micronaut-ms
@@ -22,12 +22,25 @@ cd micronaut-ms
 ./gradlew beer-waiter:run  beer-websocket:run --parallel
 
 ```
-Then on separate instances launch the beer-billing
+
+2. Then on separate instances launch the beer-billing
 ```
 ./gradlew beer-billing:run
-./gradlew beer-billing:run
+```
+
+3. Now open a socket app
+```
+./gradlew beer-websocket:run
+```
+
+4. Now open a billing app
+```
 ./gradlew beer-billing:run
 ```
+
+Repeat Steps 3 and 4 another time.
+
+
 
 
 Now open browser hit:
@@ -54,15 +67,27 @@ Videos
 
 I have uploaded a video on you tube based on this branch:
 
-1. [YouTube: micronaut : micronaut-ms websocket demo of beer-billing and beer-waiter](https://www.youtube.com/watch?v=p96gYPVgPB8)
-
-2. [YouTube: Part 2 this explains latest changes centralised websockets](https://www.youtube.com/watch?v=aQ0rNdIVq1A)
+1. [YouTube: latest video - replaces existing](https://www.youtube.com/watch?v=zN9OyTBiG7s)
 
 
+Description: Triangulated websockets
+-----
+[beer-websocket: LocalSocket.java](https://github.com/vahidhedayati/micronaut-playground/blob/beerwebsocket-demo/micronaut-ms/beer-websocket/src/main/java/beer/websocket/LocalWebSocket.java)
+This is referred to as websocket connection tab `/ls/` stands for local socket. This is used by beer-websocket application.
+It is triggered by 
+[TransactionWebsocket.java: bootService.shareSessions();](https://github.com/vahidhedayati/micronaut-playground/blob/dd13f9af63b764482d248c70e02df6ad6c289d82/micronaut-ms/beer-websocket/src/main/java/beer/websocket/TransactionWebSocket.java#L34) 
+when a new `beer-billing` application opens a websocket connection to `TransactionWebsocket` aka `/ws/` socket connection.
+It it then asked to go off and shared all the sessions between all the running instances of beer-websocket. So beer-websocket instance 1 sends all its connected websockets sessions to 2 and 2 sends to 1 and so on.
+The websocket connections that it sends is declared at the top of    `TransactionWebsocket` found as:  `public static ArrayList<WebSocketSession> sessions = new ArrayList<WebSocketSession>();`
 
-Despite the tests on the video the actual product appears to work really well whilst I am not recording so something perhaps resources on PC stops it from working whilst demoing
 
-This is results locally same as video which works absolutely fine which failed on video:
+[beer-billing: TransactionWebsocket.java](https://github.com/vahidhedayati/micronaut-playground/blob/dd13f9af63b764482d248c70e02df6ad6c289d82/micronaut-ms/beer-billing/src/main/java/micronaut/demo/beer/TransactionWebSocket.java)
+This is triggered only by `beer-websocket` application and it is when a socket application is started after there is existing running billing applications.
+This simply receives `hostname:port` of remote billing application as a message for which is directly connects back to as a `client websocket`.
+When you stop a `beer-websocket` this application detects it and removes it from the local list of clients during the [Flowable ping sending which happens every 10 seconds](https://github.com/vahidhedayati/micronaut-playground/blob/dd13f9af63b764482d248c70e02df6ad6c289d82/micronaut-ms/beer-billing/src/main/java/micronaut/demo/beer/service/BootService.java#L57-L61).
+
+ 
+You should find a test.sh script in the application which can be used to test above scenario 
 
 ```
 ./test.sh 
