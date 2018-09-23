@@ -36,6 +36,7 @@ public class LocalWebSocket {
         return session.send("{ hostName:"+hostName+"}", MediaType.APPLICATION_JSON_TYPE);
     }
 
+    /*
     @OnMessage
     public Publisher<String> onMessage(String message, WebSocketSession session) {
 
@@ -49,9 +50,10 @@ public class LocalWebSocket {
         //return  session.broadcast(msg, MediaType.APPLICATION_JSON_TYPE);
         return  session.send(message);
     }
+    */
     @OnMessage
     public Publisher<ArrayList<?>> onMessage(ArrayList<?> message, WebSocketSession session) {
-        System.out.println("WE HAVE ARRAY");
+        System.out.println("ArrayList message"+message+" "+message.getClass());
         for (int i = 0; i < sessions.size(); i++) {
             WebSocketSession sess = sessions.get(i);
             if (sess.getId()!=session.getId()) {

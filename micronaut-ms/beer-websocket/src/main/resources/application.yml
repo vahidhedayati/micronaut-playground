@@ -3,8 +3,8 @@ micronaut:
         name: beersocket
                 
 #Uncomment to set server port
-#    server:
-#        port: 8085
+    server:
+        port: ${random.port}
 ---
 consul:
     client:

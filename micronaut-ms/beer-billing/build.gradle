@@ -4,9 +4,6 @@ group "beer.billing"
 
 apply plugin:"application"
 apply plugin:"java"
-
-
-
 //apply plugin:"io.spring.dependency-management"
 //apply plugin:"com.github.johnrengelman.shadow"
 
@@ -23,10 +20,18 @@ repositories {
 dependencyManagement {
     imports {
         mavenBom 'io.micronaut:bom:1.0.0.BUILD-SNAPSHOT'
+        //mavenBom 'io.micronaut:bom:1.0.0.M4'
     }
 }
 
 
+/*
+dependencyManagement {
+    imports {
+        mavenBom 'io.micronaut:bom:1.0.0.M4'
+    }
+}
+*/
 dependencies {
     annotationProcessor "io.micronaut:inject-java"
     implementation "io.micronaut:inject"
@@ -43,7 +48,6 @@ dependencies {
 shadowJar {
     mergeServiceFiles()
 }
-
 run.jvmArgs('-noverify', '-XX:TieredStopAtLevel=1')
 
 

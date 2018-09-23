@@ -64,7 +64,8 @@ public class BootService   implements ApplicationEventListener<ServerStartupEven
                         //All we do is connect - nothing else
                         WebSocketClient client = new WebSocketClient(url);
                         client.open();
-                        System.out.println("Client connected ---------------------------------------------------------"+url+"\n");
+                        client.close();
+                        //System.out.println("Client connected ---------------------------------------------------------"+url+"\n");
                         /**
                          *
                          * The connection will trigger those apps to locally now connect with this newly started socked app
@@ -108,10 +109,8 @@ public class BootService   implements ApplicationEventListener<ServerStartupEven
                     HealthService.Service service =healthService.getService();
                     if (embeddedServer.getPort()!=service.getPort()) {
                         System.out.println("About to connect to websocket server for beersocket running on " + service.getAddress() + "/" + service.getPort());
-
                         //This now connects back to all running instances of websocket server
                         //Sends through the current port of this application
-
                         final String url = "ws://" + service.getAddress() + ":" + service.getPort() + "/ls/" + embeddedServer.getPort();
                         //final String url = "ws://localhost:9000";
                         try {
@@ -119,10 +118,7 @@ public class BootService   implements ApplicationEventListener<ServerStartupEven
                             client.open();
                             client.<String>eval("BROADCAST_SESSIONS");
                             client.close();
-
                             //System.out.println("Client connected ---------------------------------------------------------" + url + "\n");
-
-
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

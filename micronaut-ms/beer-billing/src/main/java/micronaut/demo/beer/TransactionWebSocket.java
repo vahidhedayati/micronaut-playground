@@ -7,6 +7,8 @@ import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
+import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import micronaut.demo.beer.service.BillService;
 import micronaut.demo.beer.service.BootService;
 import org.reactivestreams.Publisher;
@@ -27,24 +29,32 @@ public class TransactionWebSocket {
 
     /**
      * This happens when a new billing socket application is fired up after these apps have been fired up
-     * @param hostName
+     * @param hostName This is sent by remote socket application sends it's own hostname:port to this server
+     *                 this server simply connects to this host:port and sends it's own port
+     *
      * @param session
      * @return
      */
     @OnOpen
     public Publisher<String> onOpen(String hostName, WebSocketSession session) {
-        System.out.print("Socket connection from: "+hostName+"\n");
 
-        final String url = "ws://"+hostName+"/ws/"+embeddedServer.getPort();
-        //final String url = "ws://localhost:9000";
-        try {
-            WebSocketClient client = new WebSocketClient(url,billService);
-            client.open();
-            System.out.println("Client connected ---------------------------------------------------------"+url+"\n");
-        } catch (Exception e) {
-            e.printStackTrace();
+        //Check to see if there is already a connection added to the concurrent map
+        //Should not be there but just incase
+        WebSocketClient client = BootService.findSocket(hostName);
+        if (client==null) {
+
+            System.out.print("Socket connection from: "+hostName+"\n");
+            final String url = "ws://"+hostName+"/ws/"+embeddedServer.getPort();
+            //final String url = "ws://localhost:9000";
+            try {
+                client = new WebSocketClient(url,billService);
+                client.open();
+                //Keep connection open and add it to the existing connCurrent Maps
+                BootService.addSocket(hostName,client);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
         return session.send("{ hostName:"+hostName+"}", MediaType.APPLICATION_JSON_TYPE);
     }
 
@@ -54,9 +64,15 @@ public class TransactionWebSocket {
     }
 
 
+    @OnMessage
+    public Publisher<PongWebSocketFrame> onMessage(PongWebSocketFrame message, WebSocketSession session) {
+        System.out.println("PongWebSocketFrame message");
+        return  session.send(message);
+    }
+
     @OnClose
-    public Publisher<String> onClose(String username, WebSocketSession session) {
-        String msg = "[" + username + "] Disconnected!";
+    public Publisher<String> onClose(WebSocketSession session) {
+        String msg = "Disconnected!";
         return session.send(msg);
     }
 

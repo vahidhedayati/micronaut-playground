@@ -127,9 +127,12 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
             }
 
+        } else if (frame instanceof PingWebSocketFrame) {
+            System.out.println("WebSocket Client received pi ng");
 
         } else if (frame instanceof PongWebSocketFrame) {
             System.out.println("WebSocket Client received pong");
+
         } else if (frame instanceof CloseWebSocketFrame) {
             System.out.println("WebSocket Client received closing");
             ch.close();
