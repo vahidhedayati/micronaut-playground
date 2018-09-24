@@ -19,7 +19,7 @@ or if you have installed docker simply run `sudo docker run -p 8500:8500 consul`
 ```
 cd micronaut-ms
 
-./gradlew beer-waiter:run  beer-websocket:run --parallel
+./gradlew beer-waiter:run  beer-billing:run --parallel
 
 ```
 
@@ -28,17 +28,13 @@ cd micronaut-ms
 ./gradlew beer-billing:run
 ```
 
-3. Now open a socket app
-```
-./gradlew beer-websocket:run
-```
 
-4. Now open a billing app
+3. Now open another billing app
 ```
 ./gradlew beer-billing:run
 ```
 
-Repeat Steps 3 and 4 another time.
+Repeat Steps 2 and 3 another few times.
 
 
 
