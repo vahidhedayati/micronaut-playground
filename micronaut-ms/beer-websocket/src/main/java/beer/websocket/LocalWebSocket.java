@@ -7,11 +7,11 @@ import io.micronaut.websocket.annotation.OnClose;
 import io.micronaut.websocket.annotation.OnMessage;
 import io.micronaut.websocket.annotation.OnOpen;
 import io.micronaut.websocket.annotation.ServerWebSocket;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.reactivestreams.Publisher;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Map;
 
 @ServerWebSocket("/ls/{hostName}")
 public class LocalWebSocket {
@@ -19,13 +19,18 @@ public class LocalWebSocket {
     @Inject
     BootService bootService;
 
-    public static ArrayList<WebSocketSession> sessions = new ArrayList<WebSocketSession>();
+    //public static ArrayList<WebSocketSession> sessions = new ArrayList<WebSocketSession>();
+
+    /**
+     * This collects and manages the list of beer-websocket application instances running
+     */
+    //public static final ConcurrentMap<String, BeerSocketHandler> liveConnections = new ConcurrentHashMap();
 
     @OnOpen
     public Publisher<String> onOpen(String hostName, WebSocketSession session) {
-        if (!hostName.startsWith("SEND_")) {
-            sessions.add(session);
-        }
+        //if (!hostName.startsWith("SEND_")) {
+          //  sessions.add(session);
+        //}
 
 
         //Share sessions triggers all running instances of this app to share session ids with each other
@@ -36,10 +41,10 @@ public class LocalWebSocket {
         return session.send("{ hostName:"+hostName+"}", MediaType.APPLICATION_JSON_TYPE);
     }
 
-    /*
+
     @OnMessage
     public Publisher<String> onMessage(String message, WebSocketSession session) {
-
+/*
         for (int i = 0; i < sessions.size(); i++) {
             WebSocketSession sess = sessions.get(i);
             if (sess.getId()!=session.getId()) {
@@ -47,20 +52,35 @@ public class LocalWebSocket {
                 sess.sendAsync(message);
             }
         }
+        */
         //return  session.broadcast(msg, MediaType.APPLICATION_JSON_TYPE);
         return  session.send(message);
     }
-    */
     @OnMessage
-    public Publisher<ArrayList<?>> onMessage(ArrayList<?> message, WebSocketSession session) {
+    public Publisher<Map<?,?>> onMessage(Map<?,?> message, WebSocketSession session) {
         System.out.println("ArrayList message"+message+" "+message.getClass());
-        for (int i = 0; i < sessions.size(); i++) {
+        /*for (int i = 0; i < sessions.size(); i++) {
             WebSocketSession sess = sessions.get(i);
             if (sess.getId()!=session.getId()) {
                 //System.out.println(session.getId()+"------------------------------->>>");
                 sess.sendAsync(message);
             }
         }
+        */
+        //return  session.broadcast(msg, MediaType.APPLICATION_JSON_TYPE);
+        return  session.send(message);
+    }
+    @OnMessage
+    public Publisher<ArrayList<?>> onMessage(ArrayList<?> message, WebSocketSession session) {
+        System.out.println("ArrayList message"+message+" "+message.getClass());
+       /* for (int i = 0; i < sessions.size(); i++) {
+            WebSocketSession sess = sessions.get(i);
+            if (sess.getId()!=session.getId()) {
+                //System.out.println(session.getId()+"------------------------------->>>");
+                sess.sendAsync(message);
+            }
+        }
+        */
         //return  session.broadcast(msg, MediaType.APPLICATION_JSON_TYPE);
         return  session.send(message);
     }
@@ -69,10 +89,11 @@ public class LocalWebSocket {
      *  Using consul we are going to use a controller client to trigger a message to be sent to all nodes
      *  in this case the clients now send via controller rather than socket which triggers a socket message to go to all
      *  connected
-     * @param message
+     * @param
      */
 
 
+    /*
     public static void myBroadCast(String message) {
         for (int i = 0; i < sessions.size(); i++) {
             sessions.get(i).sendAsync( new TextWebSocketFrame(message));
@@ -87,12 +108,13 @@ public class LocalWebSocket {
                 sessions.add(session);
             }
     }
+    */
 
 
     @OnClose
     public Publisher<String> onClose(WebSocketSession session) {
-        String msg = "[] Disconnected!";
-        sessions.remove(session);
+        String msg = "[LS] Disconnected!";
+        //sessions.remove(session);
         return session.send(msg);
     }
 

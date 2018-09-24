@@ -87,57 +87,57 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
             return;
         }
 
-        System.out.println(" ,sg "+msg);
+        //System.out.println(" ,sg "+msg);
         if (msg instanceof FullHttpResponse) {
             FullHttpResponse response = (FullHttpResponse) msg;
             throw new IllegalStateException(
                     "Unexpected FullHttpResponse (getStatus=" + response.status() +
                             ", content=" + response.content().toString(CharsetUtil.UTF_8) + ')');
         }
+
         if (msg instanceof byte[]) {
             String msg1= new String((byte[])msg);
             System.out.println("Websocket Content "+msg1);//+
-            if (msg1=="BROADCAST_SESSIONS") {
-                System.out.println("BROADCAST_SESSIONS event happened");
-                //We send all the sessions of each server back to each other then we collect a few lines above
-                // around this bit msg instanceof ArrayList<?>
-                addSessions(TransactionWebSocket.sessions);
-            } else if (msg1 == "__PING__") {
+            if (msg1 == "__PING__") {
                 System.out.println("Got a ping sending a pong back");
                 ch.writeAndFlush(new PongWebSocketFrame(((PingWebSocketFrame) msg).content()));
+
             }
         }
+
         if (msg instanceof String) {
             System.out.println("Websocket Content String string "+msg);//+
-            if (msg=="BROADCAST_SESSIONS") {
-                System.out.println("BROADCAST_SESSIONS event happened");
-                //We send all the sessions of each server back to each other then we collect a few lines above
-                // around this bit msg instanceof ArrayList<?>
-                addSessions(TransactionWebSocket.sessions);
-            } else if (msg == "__PING__") {
+            if (msg == "__PING__") {
                 System.out.println("Got a ping sending a pong back");
                 ch.writeAndFlush(new PongWebSocketFrame(((PingWebSocketFrame) msg).content()));
             }
         }
-        /*
+
         if (msg instanceof PingWebSocketFrame) {
             System.out.println("WebSocket Client received ping --- sending pong back 3333 ");
             //ch.writeAndFlush(new PongWebSocketFrame(((PingWebSocketFrame) msg).content()));
-        }else
-         */
+        }
+
         if (msg instanceof ArrayList<?>) {
             //System.out.println("yes array list ");
             //if(((ArrayList<?>)msg).get(0) instanceof WebSocketSession) {
                 System.out.println("Websocket sessions sent over ---");
                 for (Object item : (ArrayList<?>) msg) {
                     //System.out.println("Trying to add  socket");//+((WebSocketSession)item).getId());
-                    TransactionWebSocket.addSession(((WebSocketSession) item));
+                    //TransactionWebSocket.addSession(((WebSocketSession) item));
+                    WebSocketSession session = (WebSocketSession) item;
+                    String hostPort = TransactionWebSocket.getKeyFromValue(TransactionWebSocket.liveConnections,session);
+                    if (hostPort==null) {
+                        System.out.println("WE NEED TO CONNECT");
+                        session.sendAsync("CONNECT>"+embeddedServer.getHost()+":"+embeddedServer.getPort());
+                    }
+
                 }
-                System.out.println("Received all websocket sessions from another beersocket application");
+                //System.out.println("Received all websocket sessions from another beersocket application");
             //}
 
         } else {
-            System.out.println("ALL OTHER MESSAGE TYPE");
+            System.out.println("ALL OTHER MESSAGE TYPE>>>" +msg.getClass());
             WebSocketFrame frame = (WebSocketFrame) msg;
             if (frame instanceof TextWebSocketFrame) {
                 TextWebSocketFrame textFrame = (TextWebSocketFrame) frame;
@@ -146,15 +146,18 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                 String content = textFrame.text();
 
                 System.out.println("Websocket Content "+content);//+
-                if (content=="BROADCAST_SESSIONS") {
+
+                if (content.contains("BROADCAST_SESSIONS")) {
                     System.out.println("BROADCAST_SESSIONS event happened");
                     //We send all the sessions of each server back to each other then we collect a few lines above
                     // around this bit msg instanceof ArrayList<?>
-                    addSessions(TransactionWebSocket.sessions);
-                } else if (content == "__PING__") {
+                    addSessions(TransactionWebSocket.getLiveSessions());
+                }
+                /*else if (content.contains("__PING__")) {
                     System.out.println("Got a ping sending a pong back");
                     ch.writeAndFlush(new PongWebSocketFrame(((PingWebSocketFrame) msg).content()));
                 }
+                */
             } else if (frame instanceof PingWebSocketFrame) {
                 System.out.println("WebSocket Client received ping --- sending pong back aaaaaaaaaaaaaa");
                 //  ch.writeAndFlush(new PongWebSocketFrame(((PingWebSocketFrame) frame).content()));

@@ -77,11 +77,11 @@ public class BootService implements ApplicationEventListener<ServerStartupEvent>
     */
 
     /**
-     * This is the Completable object passed to Flowable aboe
+     * This is the Completable object passed to Flowable above
      * @return
      */
     Completable pingAvailableSocketServers() {
-        RunPing r = new RunPing(this);
+        RunPing r = new RunPing(this, embeddedServer);
         return Completable
                 .fromRunnable(r)
                 .subscribeOn(Schedulers.io())
@@ -123,7 +123,7 @@ public class BootService implements ApplicationEventListener<ServerStartupEvent>
 
     public void connect(String hostPort) {
         BeerSocketHandler cl = findSocketHandler(hostPort);
-        final String url = "ws://"+hostPort+"/ws/"+embeddedServer.getPort();
+        final String url = "ws://"+hostPort+"/ws/"+embeddedServer.getHost()+":"+embeddedServer.getPort();
         //This now connects back to all running instances of websocket server
         //Sends through the current port of this application
         try {
@@ -191,9 +191,11 @@ public class BootService implements ApplicationEventListener<ServerStartupEvent>
  */
 class RunPing implements Runnable {
     BootService bootService;
+    EmbeddedServer embeddedServer;
+
     @Inject
-    RunPing(BootService bootService) {
-        this.bootService=bootService;
+    RunPing(BootService bootService,EmbeddedServer embeddedServer) {
+        this.bootService=bootService; this.embeddedServer=embeddedServer;
     }
     @Override
     public void run() {
@@ -223,10 +225,10 @@ class RunPing implements Runnable {
                     Long lastRun = cl.getTimeStamp();
                     Long diff = System.currentTimeMillis()-lastRun;
                     //System.out.println("Difference "+diff);
-                    if (System.currentTimeMillis()-lastRun<5000) {
+                    if (diff<5000) {
                         //System.out.println("Pinged back ");
                         //client.eval("{ping:true}");
-                        client.eval("__PING__");
+                        client.eval("__PING__>"+embeddedServer.getHost()+":"+embeddedServer.getPort());
                         //client.ping();
                         //currentBootService.remove(currentKey);
                     } else {

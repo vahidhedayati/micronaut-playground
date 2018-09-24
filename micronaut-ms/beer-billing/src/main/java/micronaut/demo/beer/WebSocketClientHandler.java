@@ -112,26 +112,41 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
              //System.out.println("WebSocket Client received message: " + textFrame.text()+"\n\n\n\n\n\n\n\n\n\n");
             //ctx.channel().writeAndFlush();
             String content = textFrame.text();
-            //System.out.println("WG2 "+content+getClass()+" "+content);
+           // System.out.println("WG2 "+content+getClass()+" "+content);
             //System.out.println("Websocket Content "+content);//+
-            if (content.indexOf(':')>-1 && !content.contains("__PING__")) {
+            if (content.contains("CONNECT")) {
+                //session.sendAsync("CONNECT>"+embeddedServer.getHost()+":"+embeddedServer.getPort());
+                if (content.contains(">")) {
+                    String[] parts = new String(content).split(">");
+                    if (parts != null && parts.length >= 1) {
+                        String hostPort = parts[1];
+                        if (hostPort != null) {
+                            ///String hostPort=new String(content).substring(content.indexOf('|')+1,content.length());
+                            System.out.print("connecting to new connection ------------------------------------------------>"+hostPort);
+                            bootService.connect(hostPort);
+                        }
+                    }
+                }
+            } else if (content.indexOf(':')>-1 && !content.contains("__PING__") && !content.contains("hostName")) {
                 String[] parts = content.split(":");
+
                 String username=parts[0];
+
                 String beerName=parts[1];
-               // BeerItem.Size beerSize=BeerItem.Size.MEDIUM;
+                // BeerItem.Size beerSize=BeerItem.Size.MEDIUM;
                 if (parts.length>2) {
                     String beerSize=parts[2];
 
 
 
-                /**
-                 * This is the logic now from TicketController.java - being executed by
-                 * each WebsocketClientHander on each running instance of the beer-billing application
-                 *
-                 *
-                 */
+                    /**
+                     * This is the logic now from TicketController.java - being executed by
+                     * each WebsocketClientHander on each running instance of the beer-billing application
+                     *
+                     *
+                     */
 
-              //  System.out.println("Billing "+username+" beerName "+beerName);//
+                    //  System.out.println("Billing "+username+" beerName "+beerName);//
                     Optional<Ticket> t = getTicketForUser(username);
                     BeerItem beer = new BeerItem(beerName,BeerItem.Size.valueOf(beerSize));// );
                     Ticket ticket = t.isPresent() ?  t.get() : new Ticket();
@@ -139,7 +154,6 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                     System.out.println("Billing "+username+" ticket "+ticket+ " size:"+beerSize);
                     billService.createBillForCostumer(username, ticket);
                 }
-
             } else {
                 /**
                  * When a ping is sent the other side responds back with the same message

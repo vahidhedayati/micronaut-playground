@@ -46,7 +46,7 @@ public class TransactionWebSocket {
         //Should not be there but just incase
         BeerSocketHandler cl = findSocketHandler(hostName);
         WebSocketClient client;
-        final String url = "ws://"+hostName+"/ws/"+embeddedServer.getPort();
+        final String url = "ws://"+hostName+"/ws/"+embeddedServer.getHost()+":"+embeddedServer.getPort();
 
         if (cl!=null) {
             client = cl.getClient();
