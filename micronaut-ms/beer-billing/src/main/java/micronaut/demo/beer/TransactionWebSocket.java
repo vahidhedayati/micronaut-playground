@@ -15,16 +15,20 @@ import org.reactivestreams.Publisher;
 
 import javax.inject.Inject;
 
+import static micronaut.demo.beer.service.BootService.findSocketHandler;
+
 @ServerWebSocket("/ws/{hostName}")
 public class TransactionWebSocket {
 
     EmbeddedServer embeddedServer;
     BillService billService;
-
+    BootService bootService;
     @Inject
-    public TransactionWebSocket(EmbeddedServer embeddedServer,BillService billService) {
+    public TransactionWebSocket(EmbeddedServer embeddedServer,BillService billService,BootService bootService) {
         this.embeddedServer = embeddedServer;
         this.billService=billService;
+        this.bootService=bootService;
+
     }
 
     /**
@@ -40,21 +44,25 @@ public class TransactionWebSocket {
 
         //Check to see if there is already a connection added to the concurrent map
         //Should not be there but just incase
-        WebSocketClient client = BootService.findSocket(hostName);
-        if (client==null) {
+        BeerSocketHandler cl = findSocketHandler(hostName);
+        WebSocketClient client;
+        final String url = "ws://"+hostName+"/ws/"+embeddedServer.getPort();
 
-            System.out.print("Socket connection from: "+hostName+"\n");
-            final String url = "ws://"+hostName+"/ws/"+embeddedServer.getPort();
-            //final String url = "ws://localhost:9000";
-            try {
-                client = new WebSocketClient(url,billService);
-                client.open();
-                //Keep connection open and add it to the existing connCurrent Maps
-                BootService.addSocket(hostName,client);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (cl!=null) {
+            client = cl.getClient();
+        }else {
+            client = new WebSocketClient(url,billService,bootService);
         }
+        System.out.print("Socket connection from: "+hostName+"\n");
+        //final String url = "ws://localhost:9000";
+        try {
+            client.open();
+            //Keep connection open and add it to the existing connCurrent Maps
+            BootService.addSocket(hostName,client);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return session.send("{ hostName:"+hostName+"}", MediaType.APPLICATION_JSON_TYPE);
     }
 

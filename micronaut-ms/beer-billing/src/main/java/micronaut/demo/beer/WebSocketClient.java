@@ -15,6 +15,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
 import micronaut.demo.beer.service.BillService;
+import micronaut.demo.beer.service.BootService;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -25,14 +26,15 @@ public class WebSocketClient {
     private final URI uri;
     private Channel ch;
     final BillService billService;
-
+    final BootService bootService;
     private static final EventLoopGroup group = new NioEventLoopGroup();
     WebSocketClientHandler handler;
 
     @Inject
-    public WebSocketClient(final String uri, BillService billService ) {
+    public WebSocketClient(final String uri, BillService billService,BootService bootService ) {
         this.uri = URI.create(uri);
         this.billService=billService;
+        this.bootService=bootService;
     }
 
     public void open() throws Exception {
@@ -46,7 +48,7 @@ public class WebSocketClient {
         handler =
                 new WebSocketClientHandler(
                         WebSocketClientHandshakerFactory.newHandshaker(
-                                uri, WebSocketVersion.V13, null, true, new DefaultHttpHeaders()), billService);
+                                uri, WebSocketVersion.V13, null, true, new DefaultHttpHeaders()), billService,bootService);
         // uri, WebSocketVersion.V13, null, false, HttpHeaders.EMPTY_HEADERS, 1280000));
 
         b.group(group)

@@ -94,6 +94,31 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                     "Unexpected FullHttpResponse (getStatus=" + response.status() +
                             ", content=" + response.content().toString(CharsetUtil.UTF_8) + ')');
         }
+        if (msg instanceof byte[]) {
+            String msg1= new String((byte[])msg);
+            System.out.println("Websocket Content "+msg1);//+
+            if (msg1=="BROADCAST_SESSIONS") {
+                System.out.println("BROADCAST_SESSIONS event happened");
+                //We send all the sessions of each server back to each other then we collect a few lines above
+                // around this bit msg instanceof ArrayList<?>
+                addSessions(TransactionWebSocket.sessions);
+            } else if (msg1 == "__PING__") {
+                System.out.println("Got a ping sending a pong back");
+                ch.writeAndFlush(new PongWebSocketFrame(((PingWebSocketFrame) msg).content()));
+            }
+        }
+        if (msg instanceof String) {
+            System.out.println("Websocket Content String string "+msg);//+
+            if (msg=="BROADCAST_SESSIONS") {
+                System.out.println("BROADCAST_SESSIONS event happened");
+                //We send all the sessions of each server back to each other then we collect a few lines above
+                // around this bit msg instanceof ArrayList<?>
+                addSessions(TransactionWebSocket.sessions);
+            } else if (msg == "__PING__") {
+                System.out.println("Got a ping sending a pong back");
+                ch.writeAndFlush(new PongWebSocketFrame(((PingWebSocketFrame) msg).content()));
+            }
+        }
         /*
         if (msg instanceof PingWebSocketFrame) {
             System.out.println("WebSocket Client received ping --- sending pong back 3333 ");
@@ -102,36 +127,14 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
          */
         if (msg instanceof ArrayList<?>) {
             //System.out.println("yes array list ");
-            if(((ArrayList<?>)msg).get(0) instanceof WebSocketSession) {
+            //if(((ArrayList<?>)msg).get(0) instanceof WebSocketSession) {
                 System.out.println("Websocket sessions sent over ---");
                 for (Object item : (ArrayList<?>) msg) {
                     //System.out.println("Trying to add  socket");//+((WebSocketSession)item).getId());
                     TransactionWebSocket.addSession(((WebSocketSession) item));
                 }
                 System.out.println("Received all websocket sessions from another beersocket application");
-            } else {
-                WebSocketFrame frame = (WebSocketFrame) msg;
-                System.out.println("Other array list type");
-                for (Object item : (ArrayList<?>) msg) {
-                    System.out.println("Other array list type"+item);
-                    if (frame instanceof TextWebSocketFrame) {
-                        System.out.println("Other array list type"+frame);
-                        TextWebSocketFrame textFrame = (TextWebSocketFrame) frame;
-                        if (textFrame.text()=="BROADCAST_SESSIONS") {
-                            System.out.println("BROADCAST_SESSIONS event happenedaa");
-                            //We send all the sessions of each server back to each other then we collect a few lines above
-                            // around this bit msg instanceof ArrayList<?>
-                            addSessions(TransactionWebSocket.sessions);
-
-                        } else if (textFrame.text() == "__PING__") {
-                            System.out.println("Got a ping sending a pong backaaa");
-                            ch.writeAndFlush(new PongWebSocketFrame(((PingWebSocketFrame) msg).content()));
-                        }
-                    }
-
-
-                }
-            }
+            //}
 
         } else {
             System.out.println("ALL OTHER MESSAGE TYPE");
