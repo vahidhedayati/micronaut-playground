@@ -32,9 +32,9 @@ subprojects { project ->
 
 
         dependencies {
-            if(project.name != 'waiter' ) {
-                compile "com.ecwid.consul:consul-api:1.4.1"
-            }
+           // if(project.name != 'waiter' ) {
+            //    compile "com.ecwid.consul:consul-api:1.4.1"
+          //  }
             if(project.name != 'something' && !project.path.contains(':someFunction') && !project.path.contains(':frontend')) {
                 compile "io.micronaut.configuration:hibernate-validator"
                 compile "io.micronaut.configuration:hibernate-gorm"
@@ -48,6 +48,8 @@ subprojects { project ->
                 compile "io.micronaut:tracing"
                 //compile "io.micronaut.configuration:kafka"
 
+
+                compile "com.ecwid.consul:consul-api:1.4.1"
 
 
                 // https://mvnrepository.com/artifact/org.projectlombok/lombok

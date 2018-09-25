@@ -1,7 +1,5 @@
 package micronaut.demo.beer;
 
-import io.micronaut.tracing.annotation.ContinueSpan;
-import io.micronaut.tracing.annotation.SpanTag;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -9,20 +7,16 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import micronaut.demo.beer.model.BeerItem;
-import micronaut.demo.beer.model.Ticket;
-import micronaut.demo.beer.service.BillService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Optional;
+
 public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketClientHandler.class);
 
     private final WebSocketClientHandshaker handshaker;
 
-    final BillService billService;
 
 
     private ChannelPromise handshakeFuture;
@@ -31,9 +25,8 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
 
     @Inject
-    public WebSocketClientHandler(final WebSocketClientHandshaker handshaker, BillService billService) {
+    public WebSocketClientHandler(final WebSocketClientHandshaker handshaker) {
         this.handshaker = handshaker;
-        this.billService=billService;
     }
 
     public ChannelFuture handshakeFuture() {
@@ -90,34 +83,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         WebSocketFrame frame = (WebSocketFrame) msg;
         if (frame instanceof TextWebSocketFrame) {
             TextWebSocketFrame textFrame = (TextWebSocketFrame) frame;
-            String content = textFrame.text();
-            if (content.indexOf(':')>-1) {
-                String[] parts = content.split(":");
 
-                String username = parts[0];
-
-                String beerName = parts[1];
-                // BeerItem.Size beerSize=BeerItem.Size.MEDIUM;
-                if (parts.length > 2) {
-                    String beerSize = parts[2];
-
-
-                    /**
-                     * This is the logic now from TicketController.java - being executed by
-                     * each WebsocketClientHander on each running instance of the beer-billing application
-                     *
-                     *
-                     */
-
-                    //  System.out.println("Billing "+username+" beerName "+beerName);//
-                    Optional<Ticket> t = getTicketForUser(username);
-                    BeerItem beer = new BeerItem(beerName, BeerItem.Size.valueOf(beerSize));// );
-                    Ticket ticket = t.isPresent() ? t.get() : new Ticket();
-                    ticket.add(beer);
-                    System.out.println("Billing " + username + " ticket " + ticket + " size:" + beerSize);
-                    billService.createBillForCostumer(username, ticket);
-                }
-            }
         } else if (frame instanceof PingWebSocketFrame) {
             System.out.println("WebSocket Client received pi ng");
 
@@ -125,16 +91,13 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
             System.out.println("WebSocket Client received pong");
 
         } else if (frame instanceof CloseWebSocketFrame) {
-            System.out.println("WebSocket Client received closing");
+           // System.out.println("WebSocket Client received closing");
             ch.close();
         }
 
     }
 
-    @ContinueSpan
-    private Optional<Ticket> getTicketForUser(@SpanTag("getTicketForUser") String customerName) {
-        return Optional.ofNullable(billService.getBillForCostumer(customerName));
-    }
+
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
         cause.printStackTrace();

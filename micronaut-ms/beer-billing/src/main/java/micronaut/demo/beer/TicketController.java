@@ -56,34 +56,6 @@ public class TicketController {
 	@Post("/addBeer/{customerName}")
 	public HttpResponse<BeerItem> addBeerToCustomerBill(@Body BeerItem beer, @NotBlank String customerName) {
 
-
-		ConsulClient client1 = new ConsulClient("localhost");
-		Response<List<HealthService>> healthyServices = client1.getHealthServices("billing", true, QueryParams.DEFAULT);
-		List<HealthService> healthServices = healthyServices.getValue();
-		healthServices.stream()
-				.forEach(healthService -> {
-					HealthService.Service service =healthService.getService();
-					// if (embeddedServer.getPort()!=service.getPort()) {}
-
-					//This now connects back to all running instances of websocket server
-					//Sends through the current port of this application as well as its name making up most of the ws://{host}:{port} up
-					//otherside simply triggers socket connection to it
-
-					String hostPort = service.getAddress() + ":" + service.getPort();
-					final String url = "ws://"+hostPort+"/ws/";
-					System.out.println("About to connect to billing server for beer-websocket running on "+url);
-					try {
-						WebSocketClient client=new WebSocketClient(url,billService);
-						client.open();
-						client.eval(customerName+":"+beer.getName()+":"+beer.getSize().toString());
-						client.close();
-					} catch (Exception e) {
-
-					}
-
-
-				});
-
 		return HttpResponse.ok(beer);
 	}
 
