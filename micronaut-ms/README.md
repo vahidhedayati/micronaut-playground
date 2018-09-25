@@ -65,6 +65,7 @@ I have uploaded a video on you tube based on this branch:
 
 1. [YouTube: latest video - replaces existing](https://www.youtube.com/watch?v=zN9OyTBiG7s)
 
+2.[YouTube: Part 2 simplied version](https://www.youtube.com/watch?v=TYCDUDsILVQ) 
 
 Description: Triangulated websockets
 -----
